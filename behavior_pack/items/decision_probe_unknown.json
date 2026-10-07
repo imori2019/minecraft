@@ -1,0 +1,18 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "shopuilook2:decision_probe_unknown",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "未設定の商品"
+      },
+      "minecraft:icon": "shopuilook2:landing_unknown_icon",
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

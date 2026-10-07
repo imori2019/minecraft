@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "shop_ui_look2",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "shopuilook2:decision_probe_clear_v2": {
+      "textures": "textures/shopuilook2/items/decision_probe_clear_v2"
+    },
+    "shopuilook2:landing_unknown_icon": {
+      "textures": "textures/shop_icons/_unknown"
+    }
+  }
+}

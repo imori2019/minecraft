@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "ショップテーブルver1.1",
+    "description": "ショップテーブルver1.1 Resource Pack",
+    "uuid": "ecba52b6-70e3-41c4-a6d0-d974106bc5e2",
+    "version": [
+      1,
+      1,
+      25
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      50
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "e71e0b3d-3123-4fcc-9242-e7605781f39f",
+      "version": [
+        1,
+        1,
+        25
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "shop_ui_look2",
+  "texture_name": "atlas.terrain",
+  "texture_data": {
+    "shopuilook2_panel": {
+      "textures": "textures/blocks/crafting_table_top"
+    }
+  }
+}

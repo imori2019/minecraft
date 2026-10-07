@@ -1,0 +1,18 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "shopuilook2:decision_probe",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:display_name": {
+        "value": "decision_probe TEST"
+      },
+      "minecraft:icon": "shopuilook2:decision_probe_clear_v2",
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

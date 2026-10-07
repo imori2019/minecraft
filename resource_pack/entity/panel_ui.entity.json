@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "shopuilook2:panel_ui",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/shop_panel_ui_invisible"
+      },
+      "geometry": {
+        "default": "geometry.shopuilook2.invisible"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

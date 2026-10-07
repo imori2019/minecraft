@@ -1,0 +1,120 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "shopuilook2:panel_ui",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "shop_panel_ui"
+        ]
+      },
+      "minecraft:inventory": {
+        "container_type": "container",
+        "inventory_size": 256,
+        "can_be_siphoned_from": false,
+        "private": false
+      },
+      "minecraft:collision_box": {
+        "width": 0.001,
+        "height": 0.001
+      },
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:persistent": {},
+      "minecraft:health": {
+        "value": 1000,
+        "max": 1000
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:fire_immune": {},
+      "minecraft:breathable": {
+        "breathes_air": true,
+        "breathes_water": true,
+        "breathes_lava": true,
+        "breathes_solids": true,
+        "generates_bubbles": false,
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:mob_effect_immunity": {
+        "mob_effects": [
+          "absorption",
+          "bad_omen",
+          "blindness",
+          "conduit_power",
+          "darkness",
+          "fatal_poison",
+          "fire_resistance",
+          "haste",
+          "health_boost",
+          "hunger",
+          "infested",
+          "instant_damage",
+          "instant_health",
+          "invisibility",
+          "jump_boost",
+          "levitation",
+          "mining_fatigue",
+          "nausea",
+          "night_vision",
+          "oozing",
+          "poison",
+          "raid_omen",
+          "regeneration",
+          "resistance",
+          "saturation",
+          "slow_falling",
+          "slowness",
+          "speed",
+          "strength",
+          "trial_omen",
+          "village_hero",
+          "water_breathing",
+          "weakness",
+          "weaving",
+          "wind_charged",
+          "wither"
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:nameable": {
+        "always_show": false,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:custom_hit_test": {
+        "hitboxes": [
+          {
+            "width": 1.02,
+            "height": 1.04,
+            "pivot": [
+              0,
+              0.5,
+              0
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

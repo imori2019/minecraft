@@ -1,0 +1,11 @@
+{
+  "ui_defs": [
+    "ui/shop_layout_single.json",
+    "ui/shop_layout_multi.json",
+    "ui/shop_layout_kuji.json",
+    "ui/shop_layout_kuji_edit.json",
+    "ui/shop_layout_store.json",
+    "ui/shop_layout_landing.json",
+    "ui/shop_layout_price.json"
+  ]
+}
