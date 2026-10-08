@@ -6534,8 +6534,15 @@ function tickSession(player, rec, block, container) {
     // Delete button
     // Dedicated slot31: never infer deletion from the product-layout slot50.
     // This makes Save/Cancel completely independent from the trash button.
+    // While a dropdown (27..31) or the weekday list (27..33) is open, slot31
+    // is one of their choices (e.g. 商品タイプ「日配商品」, 金曜), so the
+    // click belongs to them, not to the trash button.
     // ========================================================
-    if (!signalIntact(container, PRODUCT_DELETE_SIGNAL_SLOT, 1)) {
+    if (
+        !rec.openDropdown
+        && !rec.weekdayOpen
+        && !signalIntact(container, PRODUCT_DELETE_SIGNAL_SLOT, 1)
+    ) {
         clearProbeFromPlayer(player);
         beginProductDeleteConfirm(player, rec, block, container);
         return true;
