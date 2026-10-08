@@ -383,7 +383,9 @@ const TEXT_DISPLAY_MAX_WIDTH = 26; // half-width units that fit in the box
 
 // 日配商品: 定番商品の通常設定に、曜日別販売時間と段階割引だけを上乗せする。
 const DAILY_SUPPLY_PROP = "shop_daily_supply_schedule_v1";
-const DAILY_SUPPLY_ACTION_SLOT = 31;
+// slot31 is the product delete (trash) signal, so the 日配商品設定 button
+// needs its own slot. 54+ is reachable from the UI (price page uses 61..75).
+const DAILY_SUPPLY_ACTION_SLOT = 90;
 const DAILY_SUPPLY_DAYS = [
     { key: "mon", label: "月曜" },
     { key: "tue", label: "火曜" },
@@ -1604,8 +1606,7 @@ function parseDailySupplyFormValues(values) {
 }
 
 function openDailySupplySettings(player, rec, block, container) {
-    // The same slot is the 5th product-type choice while that dropdown is open.
-    // Restore it before closing so the captured container is clean.
+    // Restore the clicked signal before closing so the captured container is clean.
     setProbe(container, DAILY_SUPPLY_ACTION_SLOT, 1);
     clearProbeFromPlayer(player);
 
@@ -6205,6 +6206,7 @@ function arm(player, block, startPage = "landing") {
     setProbe(container, PRODUCT_DELETE_SIGNAL_SLOT, 1);
     setProbe(container, PRODUCT_DELETE_NO_SLOT, 1);
     setProbe(container, PRODUCT_DELETE_STATE_SLOT, 1);
+    setProbe(container, DAILY_SUPPLY_ACTION_SLOT, 1);
 
     for (const def of DROPDOWNS) {
         if (
@@ -6807,8 +6809,8 @@ function tickSession(player, rec, block, container) {
 
     // ========================================================
     // 日配商品専用設定
-    // choice 4 のときだけ slot31 は「日配商品設定」ボタンになる。
-    // 商品タイプのドロップダウンが開いている間は同じ slot31 が5番目の選択肢。
+    // choice 4 のときだけ表示される「日配商品設定」ボタン（専用 slot90）。
+    // slot31 は商品削除ボタンなので共有しない。
     // ========================================================
     if (
         !rec.openDropdown
