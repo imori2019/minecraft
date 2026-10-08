@@ -2909,7 +2909,7 @@
                   {
                     "confirm_vis": {
                       "type": "panel",
-                      "collection_index": 33,
+                      "collection_index": 93,
                       "size": [
                         "100%",
                         "100%"
@@ -3053,7 +3053,7 @@
                                         "controls": [
                                           {
                                             "signal@common.container_item": {
-                                              "collection_index": 31,
+                                              "collection_index": 91,
                                               "$item_collection_name": "container_items",
                                               "size": [
                                                 "100%",
@@ -3153,7 +3153,7 @@
                                         "controls": [
                                           {
                                             "signal@common.container_item": {
-                                              "collection_index": 32,
+                                              "collection_index": 92,
                                               "$item_collection_name": "container_items",
                                               "size": [
                                                 "100%",
@@ -3329,7 +3329,7 @@
                                               "controls": [
                                                 {
                                                   "signal@common.container_item": {
-                                                    "collection_index": 31,
+                                                    "collection_index": 91,
                                                     "$item_collection_name": "container_items",
                                                     "size": [
                                                       "100%",
