@@ -284,9 +284,11 @@ const PROP_PAYMENT_ITEM_ROWS = "shop_payment_item_rows";
 
 const FOOTER_CANCEL_SLOT = 37;
 const FOOTER_SAVE_SLOT = 40;
-const PRODUCT_DELETE_SIGNAL_SLOT = 31;
-const PRODUCT_DELETE_NO_SLOT = 32;
-const PRODUCT_DELETE_STATE_SLOT = 33;
+// Dedicated slots: 27..33 are shared dropdown / weekday choices, so the
+// trash button and its confirm dialog must not live there.
+const PRODUCT_DELETE_SIGNAL_SLOT = 91;
+const PRODUCT_DELETE_NO_SLOT = 92;
+const PRODUCT_DELETE_STATE_SLOT = 93;
 const ALL_TEXT_EDIT_SIGNAL_SLOT = 40;
 
 // ============================================================
@@ -383,7 +385,9 @@ const TEXT_DISPLAY_MAX_WIDTH = 26; // half-width units that fit in the box
 
 // 日配商品: 定番商品の通常設定に、曜日別販売時間と段階割引だけを上乗せする。
 const DAILY_SUPPLY_PROP = "shop_daily_supply_schedule_v1";
-const DAILY_SUPPLY_ACTION_SLOT = 31;
+// Own slot: 27..31 are shared dropdown choices. 54+ is reachable from the
+// UI (price page uses 61..75).
+const DAILY_SUPPLY_ACTION_SLOT = 90;
 const DAILY_SUPPLY_DAYS = [
     { key: "mon", label: "月曜" },
     { key: "tue", label: "火曜" },
@@ -1604,8 +1608,7 @@ function parseDailySupplyFormValues(values) {
 }
 
 function openDailySupplySettings(player, rec, block, container) {
-    // The same slot is the 5th product-type choice while that dropdown is open.
-    // Restore it before closing so the captured container is clean.
+    // Restore the clicked signal before closing so the captured container is clean.
     setProbe(container, DAILY_SUPPLY_ACTION_SLOT, 1);
     clearProbeFromPlayer(player);
 
@@ -6205,6 +6208,11 @@ function arm(player, block, startPage = "landing") {
     setProbe(container, PRODUCT_DELETE_SIGNAL_SLOT, 1);
     setProbe(container, PRODUCT_DELETE_NO_SLOT, 1);
     setProbe(container, PRODUCT_DELETE_STATE_SLOT, 1);
+    setProbe(container, DAILY_SUPPLY_ACTION_SLOT, 1);
+    // 32/33 used to be the delete confirm slots; keep their old idle state
+    // (weekday choices / price text channel still read them).
+    setProbe(container, 32, 1);
+    setProbe(container, 33, 1);
 
     for (const def of DROPDOWNS) {
         if (
@@ -6530,7 +6538,7 @@ function tickSession(player, rec, block, container) {
 
     // ========================================================
     // Delete button
-    // Dedicated slot31: never infer deletion from the product-layout slot50.
+    // Dedicated slot91: never infer deletion from the product-layout slot50.
     // This makes Save/Cancel completely independent from the trash button.
     // ========================================================
     if (!signalIntact(container, PRODUCT_DELETE_SIGNAL_SLOT, 1)) {
@@ -6807,12 +6815,10 @@ function tickSession(player, rec, block, container) {
 
     // ========================================================
     // 日配商品専用設定
-    // choice 4 のときだけ slot31 は「日配商品設定」ボタンになる。
-    // 商品タイプのドロップダウンが開いている間は同じ slot31 が5番目の選択肢。
+    // choice 4 のときだけ表示される「日配商品設定」ボタン（専用 slot90）。
     // ========================================================
     if (
-        !rec.openDropdown
-        && getChoiceById(block, "product_type") === 4
+        getChoiceById(block, "product_type") === 4
         && !signalIntact(container, DAILY_SUPPLY_ACTION_SLOT, 1)
     ) {
         openDailySupplySettings(player, rec, block, container);
