@@ -189,6 +189,14 @@
 | 移動 | `distance`, `distance.horizontal`, `distance.sprinting`, `distance.swimming`, `distance.gliding`, `distance.in_water`, `distance.ascent`, `distance.descent`, `jumps`, `sneak_presses`, `max_speed_bps`, `highest_y`, `lowest_y`, `dimension_changes` |
 | 時間 | `play_time_ticks` / `_seconds` / `_minutes` / `_hours`, `life_time_ticks` / `_seconds`, `session_time_ticks` / `_seconds`, `longest_life_ticks` / `_seconds`, `longest_session_ticks` / `_seconds`, `joins` |
 | その他 | `emotes`, `highest_xp_level`, `highest_xp_total` |
+| 食べる（v1.5.8） | `items_eaten`（食べた・飲んだ数）, `items_eaten.<アイテム>` |
+| 飛び道具（v1.5.8） | `shots`（弓・クロスボウ・トライデントを撃った数）, `shots.<アイテム>`, `projectile_hits`（当てた数）, `projectile_hits.<モブ>`, `projectile_block_hits`（ブロックに当たった数） |
+| 的ブロック（v1.5.8） | `target_hits`（当てた数）, `target_power_total`（点数の合計。1回 1〜15）, `target_best_power`（最高点）, `target_bullseyes`（15点の数） |
+| さわる（v1.5.8） | `blocks_interacted`（ブロックを右クリックした数）, `blocks_interacted.<ブロック>`, `entities_interacted`（モブを右クリックした数）, `entities_interacted.<モブ>` |
+| 効果（v1.5.8） | `effects_gained`（効果を受けた数）, `effects_gained.<効果>` |
+| 仕掛け（v1.5.8） | `buttons_pressed`, `levers_flipped`, `pressure_plates_pressed` |
+| 連続キル（v1.5.8） | `kill_streak`（やられるまでに倒した数。やられると 0）, `best_kill_streak`（その最高。`/rt:play` で `kill_streak` も 0 に戻る） |
+| 状態の時間（v1.5.8） | `time_sneaking_seconds`, `time_sprinting_seconds`, `time_swimming_seconds`, `time_gliding_seconds`, `time_in_water_seconds`, `time_flying_seconds`, `time_sleeping_seconds`, `time_in_air_seconds`（`_ticks` もある） |
 
 ### 今の値（リアルタイム）
 
@@ -199,6 +207,9 @@
 | 位置・速さ | `position.x` / `.y` / `.z`, `velocity.x` / `.y` / `.z`, `speed.blocks_per_second`（別名 `speed`）, `speed.horizontal_bps` |
 | 状態（1 か 0） | `state.sneaking` `sprinting` `swimming` `gliding` `flying` `on_ground` `in_water` `falling` `climbing` `sleeping` `jumping` |
 | 明るさなど | `light.level`, `light.sky`, `block.redstone_power`（足元のブロック） |
+| 空腹（v1.5.8） | `hunger`（満腹度 0〜20）, `saturation`, `exhaustion` |
+| 効果（v1.5.8） | `effect.<効果>.level`（かかっていなければ 0、スピードII なら 2）, `effect.<効果>.seconds`（残り秒）。タグは付けられない |
+| 状態（v1.5.8） | `state.on_fire`（燃えている）, `state.riding`（何かに乗っている） |
 | 持ち物 | `inventory.<項目>`, `hotbar.<項目>`, `container.<項目>`（開いている箱）, `target_container.<項目>`（見ている箱）, `held.container.<項目>` |
 | 　└ 項目 | `total_items`（別名 `total` `count`）, `used_slots`, `empty_slots`, `size`, `unique_types`, `full_stacks`, `largest_stack`, `fill_percent`, `weight`, `present`, `item.<アイテム>.count` |
 | 手に持った物 | `held.count`, `held.max_stack`, `held.weight`, `held.durability_damage`, `held.durability_max`（別名 `held.max_durability`）, `held.durability_remaining`（別名 `held.durability`）, `held.durability_percent` |

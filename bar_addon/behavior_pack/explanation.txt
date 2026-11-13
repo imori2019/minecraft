@@ -102,6 +102,26 @@
     時間    : play_time_seconds, play_time_minutes, life_time_seconds, session_time_seconds
     リアルタイム値: health, xp.level, speed.blocks_per_second, inventory.total_items など
       （inventory. / held. / armor. などで始まるものは、タグを付けられません）
+・v1.5.8 で増えた統計
+    食べる  : items_eaten（食べた・飲んだ数。.<アイテム名> で個別。例 items_eaten.bread）
+    飛び道具: shots（弓・クロスボウ・トライデントを撃った数。例 shots.bow）,
+              projectile_hits（当てた数。.<モブ名> で個別）, projectile_block_hits（ブロックに当たった数）
+    的      : target_hits（的ブロックに当てた数）, target_power_total（点数の合計。1回 1〜15点）,
+              target_best_power（最高点）, target_bullseyes（ど真ん中 15点の数）
+    さわる  : blocks_interacted（ブロックを右クリックした数。例 blocks_interacted.crafting_table）,
+              entities_interacted（モブを右クリックした数。例 entities_interacted.villager_v2）
+    効果    : effects_gained（効果を受けた数。例 effects_gained.speed）
+    仕掛け  : buttons_pressed（ボタン）, levers_flipped（レバー）, pressure_plates_pressed（感圧板）
+    連続キル: kill_streak（やられるまでに倒した数。やられると 0）, best_kill_streak（その最高）
+    状態の時間（秒）: time_sneaking_seconds, time_sprinting_seconds, time_swimming_seconds,
+              time_gliding_seconds, time_in_water_seconds, time_flying_seconds,
+              time_sleeping_seconds, time_in_air_seconds
+    リアルタイム値: hunger（満腹度 0〜20）, saturation, exhaustion,
+              effect.<効果名>.level（効果のレベル。かかっていなければ 0。例 effect.speed.level）,
+              effect.<効果名>.seconds（効果の残り秒）, state.on_fire（燃えているか）, state.riding（乗っているか）
+      （effect. で始まるものは、タグを付けられません）
+    例: /rt:countup stat:target_bullseyes 5 ど真ん中 count
+        /rt:stat AVG "target_power_total / target_hits"     的の平均点
 ※ /rt:play で、数える対象の人のその統計が 0 に戻ります（数えない人の記録は残ります）。
 ※ 途中参加した人も、数える対象ならその統計が 0 から始まります。
 ※ 統計はバーを動かしていない間も記録され続けます。

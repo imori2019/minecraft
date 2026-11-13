@@ -18,7 +18,7 @@ import {
   getReusableStatSourceValue,
   reusableStatKeyFromSource,
   parseReusableStatSource,
-  reusableStatStoredKey
+  reusableStatResetKeys
 } from "../reusable_stat_source.js";
 import {
   setReusableStoredStat
@@ -187,7 +187,10 @@ export function resetCounterSource(players, source) {
       // Players that are not counted keep their recorded value.
       if (!playerMatchesStatTag(list[i], parsed.tag)) continue;
       for (var k = 0; k < parsed.keys.length; k++) {
-        setReusableStoredStat(list[i], reusableStatStoredKey(parsed.keys[k]), 0);
+        var resetKeys = reusableStatResetKeys(parsed.keys[k]);
+        for (var r = 0; r < resetKeys.length; r++) {
+          setReusableStoredStat(list[i], resetKeys[r], 0);
+        }
       }
     }
     return true;

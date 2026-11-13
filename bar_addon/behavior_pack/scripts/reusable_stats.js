@@ -33,6 +33,24 @@ function key(value) {
   return normalizeReusableStatKey(value || "unknown");
 }
 
+// "minecraft:speed" / "speed" -> "minecraft.speed"
+function idKey(value) {
+  var k = key(value);
+  return k.indexOf(".") < 0 ? "minecraft." + k : k;
+}
+
+// The player behind an event source: the player itself, or the owner of a
+// projectile (arrow, trident, snowball ...).
+function sourcePlayer(entity) {
+  if (isPlayer(entity)) return entity;
+  try {
+    var component = entity && entity.getComponent("minecraft:projectile");
+    var owner = component && component.owner;
+    if (isPlayer(owner)) return owner;
+  } catch (e) {}
+  return undefined;
+}
+
 function damagingPlayer(source) {
   try {
     if (isPlayer(source && source.damagingEntity)) {
@@ -156,6 +174,9 @@ function initializeEvents() {
         addReusableStoredStat(killer, "kills." + key(dead.typeId), 1);
       }
       addReusableStoredStat(killer, "kills_by_cause." + cause, 1);
+
+      var streak = addReusableStoredStat(killer, "kill_streak", 1);
+      maxReusableStoredStat(killer, "best_kill_streak", streak);
     }
 
     if (isPlayer(dead)) {
@@ -174,6 +195,7 @@ function initializeEvents() {
       } catch (e) {}
 
       setReusableStoredStat(dead, "life_time_ticks", 0);
+      setReusableStoredStat(dead, "kill_streak", 0);
       clearReusableOpenContainer(dead);
     }
   });
@@ -432,7 +454,143 @@ function initializeEvents() {
   });
 }
 
+// Stats added in v1.5.8. Every subscription is optional: an event that this
+// game version does not have is simply skipped.
+function initializeMoreEvents() {
+  var after = world.afterEvents;
+
+  // Food eaten / potions drunk (an item use that finished).
+  safeSubscribe(after.itemCompleteUse, function (event) {
+    var player = event && event.source;
+    if (!isPlayer(player)) return;
+    var itemId = "unknown";
+    try { itemId = event.itemStack.typeId; } catch (e) {}
+    addReusableStoredStat(player, "items_eaten", 1);
+    addReusableStoredStat(player, "items_eaten." + idKey(itemId), 1);
+  });
+
+  // Bow / crossbow / trident released.
+  safeSubscribe(after.itemReleaseUse, function (event) {
+    var player = event && event.source;
+    if (!isPlayer(player)) return;
+    var itemId = "unknown";
+    try { itemId = event.itemStack.typeId; } catch (e) {}
+    addReusableStoredStat(player, "shots", 1);
+    addReusableStoredStat(player, "shots." + idKey(itemId), 1);
+  });
+
+  // A projectile from a player hit a mob / player.
+  safeSubscribe(after.projectileHitEntity, function (event) {
+    var player = sourcePlayer(event && event.source);
+    if (!player) return;
+    var hit;
+    try { hit = event.getEntityHit().entity; } catch (e) {}
+    try { if (hit && hit.id === player.id) return; } catch (e2) {}
+    var hitId = "unknown";
+    try { hitId = hit.typeId; } catch (e3) {}
+    addReusableStoredStat(player, "projectile_hits", 1);
+    addReusableStoredStat(player, "projectile_hits." + idKey(hitId), 1);
+  });
+
+  // A projectile from a player hit a block (a miss, unless it is a target).
+  safeSubscribe(after.projectileHitBlock, function (event) {
+    var player = sourcePlayer(event && event.source);
+    if (!player) return;
+    addReusableStoredStat(player, "projectile_block_hits", 1);
+  });
+
+  // Target block: redstone power 1-15, 15 = bullseye.
+  safeSubscribe(after.targetBlockHit, function (event) {
+    var player = sourcePlayer(event && event.source);
+    if (!player) return;
+    var power = Math.max(0, Number(event.redstonePower) || 0);
+    addReusableStoredStat(player, "target_hits", 1);
+    addReusableStoredStat(player, "target_power_total", power);
+    maxReusableStoredStat(player, "target_best_power", power);
+    if (power >= 15) addReusableStoredStat(player, "target_bullseyes", 1);
+  });
+
+  // Right-click on a block (door, button, crafting table, ...), once per click.
+  safeSubscribe(after.playerInteractWithBlock, function (event) {
+    var player = event && event.player;
+    if (!isPlayer(player)) return;
+    try { if (event.isFirstEvent === false) return; } catch (e) {}
+    var blockId = "unknown";
+    try { blockId = event.block.typeId; } catch (e2) {}
+    addReusableStoredStat(player, "blocks_interacted", 1);
+    addReusableStoredStat(player, "blocks_interacted." + idKey(blockId), 1);
+  });
+
+  // Right-click on a mob (trading, feeding, taming, riding, ...).
+  safeSubscribe(after.playerInteractWithEntity, function (event) {
+    var player = event && event.player;
+    if (!isPlayer(player)) return;
+    var targetId = "unknown";
+    try { targetId = event.target.typeId; } catch (e) {}
+    addReusableStoredStat(player, "entities_interacted", 1);
+    addReusableStoredStat(player, "entities_interacted." + idKey(targetId), 1);
+  });
+
+  // A status effect started (speed, poison, ...).
+  safeSubscribe(after.effectAdd, function (event) {
+    var player = event && event.entity;
+    if (!isPlayer(player)) return;
+    var effectId = "unknown";
+    try { effectId = event.effect.typeId; } catch (e) {}
+    addReusableStoredStat(player, "effects_gained", 1);
+    addReusableStoredStat(player, "effects_gained." + idKey(effectId), 1);
+  });
+
+  safeSubscribe(after.buttonPush, function (event) {
+    var player = sourcePlayer(event && event.source);
+    if (!player) return;
+    addReusableStoredStat(player, "buttons_pressed", 1);
+  });
+
+  safeSubscribe(after.leverAction, function (event) {
+    var player = event && event.player;
+    if (!isPlayer(player)) return;
+    addReusableStoredStat(player, "levers_flipped", 1);
+  });
+
+  // Counted when the plate turns on, not while standing on it.
+  safeSubscribe(after.pressurePlatePush, function (event) {
+    var player = sourcePlayer(event && event.source);
+    if (!player) return;
+    try { if (Number(event.previousRedstonePower) > 0) return; } catch (e) {}
+    addReusableStoredStat(player, "pressure_plates_pressed", 1);
+  });
+}
+
+// Seconds spent in a state, sampled once a second (stored as ticks).
+var STATE_TIME_STATS = [
+  ["isSneaking", "time_sneaking_ticks"],
+  ["isSprinting", "time_sprinting_ticks"],
+  ["isSwimming", "time_swimming_ticks"],
+  ["isGliding", "time_gliding_ticks"],
+  ["isInWater", "time_in_water_ticks"],
+  ["isFlying", "time_flying_ticks"],
+  ["isSleeping", "time_sleeping_ticks"]
+];
+
+function sampleStateTime(player, ticks) {
+  for (var i = 0; i < STATE_TIME_STATS.length; i++) {
+    try {
+      if (player[STATE_TIME_STATS[i][0]]) {
+        addReusableStoredStat(player, STATE_TIME_STATS[i][1], ticks);
+      }
+    } catch (e) {}
+  }
+  try {
+    if (!player.isOnGround && !player.isInWater && !player.isFlying) {
+      addReusableStoredStat(player, "time_in_air_ticks", ticks);
+    }
+  } catch (e2) {}
+}
+
 function sampleTimeAndRecords(player, ticks) {
+  sampleStateTime(player, ticks);
+
   addReusableStoredStat(player, "play_time_ticks", ticks);
   addReusableStoredStat(player, "life_time_ticks", ticks);
   addReusableStoredStat(player, "session_time_ticks", ticks);
@@ -536,6 +694,7 @@ export function initializeReusableStats() {
 
   initializeReusableOpenContainerTracking();
   initializeEvents();
+  initializeMoreEvents();
 
   system.runInterval(function () {
     var players = [];

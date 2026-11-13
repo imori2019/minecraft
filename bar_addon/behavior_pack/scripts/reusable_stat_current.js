@@ -190,6 +190,29 @@ function equipmentValue(player, key) {
   return undefined;
 }
 
+// "speed.level" / "minecraft.speed.seconds"
+function effectValue(player, rest) {
+  var parts = rest.split(".");
+  if (parts.length < 2) return undefined;
+
+  var field = parts[parts.length - 1];
+  if (field !== "level" && field !== "seconds") return undefined;
+
+  var name = parts.slice(0, -1).join(".");
+  if (name.slice(0, 10) === "minecraft.") name = name.slice(10);
+
+  var effect;
+  try {
+    effect = player.getEffect(name);
+  } catch (e) {}
+  if (!effect) return 0;
+
+  if (field === "level") {
+    return safeNumber(function () { return effect.amplifier; }, 0) + 1;
+  }
+  return safeNumber(function () { return effect.duration; }, 0) / 20;
+}
+
 function armorValue(player, field) {
   var equippable;
   try {
@@ -402,6 +425,22 @@ export function getReusableCurrentStat(player, rawKey) {
     return armorValue(player, key.slice(6));
   }
 
+  // v1.5.8: hunger bar (0-20), saturation, exhaustion
+  if (key === "hunger" || key === "saturation" || key === "exhaustion") {
+    var attribute;
+    try {
+      attribute = player.getComponent("minecraft:player." + key);
+    } catch (eAttr) {}
+    return attribute
+      ? safeNumber(function () { return attribute.currentValue; }, 0)
+      : 0;
+  }
+
+  // v1.5.8: effect.<name>.level (0 = none, 1 = level I ...), effect.<name>.seconds
+  if (key.slice(0, 7) === "effect.") {
+    return effectValue(player, key.slice(7));
+  }
+
   if (key === "selected_slot") {
     return safeNumber(function () { return player.selectedSlotIndex; }, 0);
   }
@@ -484,6 +523,16 @@ export function getReusableCurrentStat(player, rawKey) {
       sleeping: "isSleeping",
       jumping: "isJumping"
     };
+
+    // v1.5.8: states that are components, not properties
+    if (stateName === "on_fire" || stateName === "riding") {
+      try {
+        return player.getComponent(
+          stateName === "on_fire" ? "minecraft:onfire" : "minecraft:riding"
+        ) ? 1 : 0;
+      } catch (eComp) {}
+      return 0;
+    }
 
     var propertyName = map[stateName];
     if (!propertyName) return undefined;

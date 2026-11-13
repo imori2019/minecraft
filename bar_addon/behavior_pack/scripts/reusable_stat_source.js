@@ -64,7 +64,9 @@ export function isReusableStatSource(source) {
 var ID_FAMILIES = [
   "kills", "killed_by", "damage_dealt", "blocks_broken", "blocks_broken_with",
   "blocks_placed", "tools_broken", "items_used", "items_picked_up",
-  "items_dropped", "containers_opened", "entity_containers_opened"
+  "items_dropped", "containers_opened", "entity_containers_opened",
+  "items_eaten", "shots", "projectile_hits", "blocks_interacted",
+  "entities_interacted", "effects_gained"
 ];
 
 // Keys that carry their own dotted tail; the whole text is the key.
@@ -73,7 +75,7 @@ var WHOLE_KEY_PREFIXES = [
   "damage_taken_by_cause.", "healing_by_cause.", "dimension_changes.",
   "distance.dimension.", "emotes.", "inventory.", "hotbar.", "held.",
   "equipment.", "armor.", "container.", "target_container.", "item.",
-  "state.", "nearby."
+  "state.", "nearby.", "effect."
 ];
 
 var KNOWN_STAT_KEYS = [
@@ -96,7 +98,22 @@ var KNOWN_STAT_KEYS = [
   "position.x", "position.y", "position.z",
   "speed.blocks_per_second", "speed.horizontal_bps",
   "velocity.x", "velocity.y", "velocity.z",
-  "light.level", "light.sky", "block.redstone_power"
+  "light.level", "light.sky", "block.redstone_power",
+  // v1.5.8
+  "items_eaten", "shots", "projectile_hits", "projectile_block_hits",
+  "target_hits", "target_power_total", "target_best_power", "target_bullseyes",
+  "blocks_interacted", "entities_interacted", "effects_gained",
+  "buttons_pressed", "levers_flipped", "pressure_plates_pressed",
+  "kill_streak", "best_kill_streak",
+  "time_sneaking_ticks", "time_sneaking_seconds",
+  "time_sprinting_ticks", "time_sprinting_seconds",
+  "time_swimming_ticks", "time_swimming_seconds",
+  "time_gliding_ticks", "time_gliding_seconds",
+  "time_in_water_ticks", "time_in_water_seconds",
+  "time_flying_ticks", "time_flying_seconds",
+  "time_sleeping_ticks", "time_sleeping_seconds",
+  "time_in_air_ticks", "time_in_air_seconds",
+  "hunger", "saturation", "exhaustion"
 ];
 
 var TEAM_WORDS = [
@@ -287,44 +304,46 @@ export function reusableStatComboMember(spec) {
 
 // Time stats in seconds / minutes / hours are worked out from the stored
 // tick count, so resetting them means resetting that tick count.
+//   key -> [stored tick stat, ticks per unit]
 var DERIVED_FROM_TICKS = {
-  play_time_seconds: "play_time_ticks",
-  play_time_minutes: "play_time_ticks",
-  play_time_hours: "play_time_ticks",
-  life_time_seconds: "life_time_ticks",
-  longest_life_seconds: "longest_life_ticks",
-  session_time_seconds: "session_time_ticks",
-  longest_session_seconds: "longest_session_ticks"
+  play_time_seconds: ["play_time_ticks", 20],
+  play_time_minutes: ["play_time_ticks", 1200],
+  play_time_hours: ["play_time_ticks", 72000],
+  life_time_seconds: ["life_time_ticks", 20],
+  longest_life_seconds: ["longest_life_ticks", 20],
+  session_time_seconds: ["session_time_ticks", 20],
+  longest_session_seconds: ["longest_session_ticks", 20],
+  time_sneaking_seconds: ["time_sneaking_ticks", 20],
+  time_sprinting_seconds: ["time_sprinting_ticks", 20],
+  time_swimming_seconds: ["time_swimming_ticks", 20],
+  time_gliding_seconds: ["time_gliding_ticks", 20],
+  time_in_water_seconds: ["time_in_water_ticks", 20],
+  time_flying_seconds: ["time_flying_ticks", 20],
+  time_sleeping_seconds: ["time_sleeping_ticks", 20],
+  time_in_air_seconds: ["time_in_air_ticks", 20]
 };
 
 // The stored stat that holds the value of `key` (the key itself for most).
 export function reusableStatStoredKey(key) {
-  return DERIVED_FROM_TICKS[key] || key;
+  var derived = DERIVED_FROM_TICKS[key];
+  return derived ? derived[0] : key;
+}
+
+// Stats that must start again together with `key` on /rt:play.
+// A best streak can only restart if the running streak restarts too.
+var RESET_TOGETHER = {
+  best_kill_streak: ["kill_streak"]
+};
+
+// Every stored stat to set to 0 when `key` is reset.
+export function reusableStatResetKeys(key) {
+  return [reusableStatStoredKey(key)].concat(RESET_TOGETHER[key] || []);
 }
 
 function derivedStoredValue(player, key) {
-  if (key === "play_time_seconds") {
-    return getReusableStoredStat(player, "play_time_ticks", 0) / 20;
-  }
-  if (key === "play_time_minutes") {
-    return getReusableStoredStat(player, "play_time_ticks", 0) / 1200;
-  }
-  if (key === "play_time_hours") {
-    return getReusableStoredStat(player, "play_time_ticks", 0) / 72000;
-  }
-  if (key === "life_time_seconds") {
-    return getReusableStoredStat(player, "life_time_ticks", 0) / 20;
-  }
-  if (key === "longest_life_seconds") {
-    return getReusableStoredStat(player, "longest_life_ticks", 0) / 20;
-  }
-  if (key === "session_time_seconds") {
-    return getReusableStoredStat(player, "session_time_ticks", 0) / 20;
-  }
-  if (key === "longest_session_seconds") {
-    return getReusableStoredStat(player, "longest_session_ticks", 0) / 20;
-  }
-  return undefined;
+  var derived = DERIVED_FROM_TICKS[key];
+  if (!derived) return undefined;
+  return getReusableStoredStat(player, derived[0], 0) / derived[1];
 }
 
 function cachedCurrentValue(player, key) {
