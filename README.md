@@ -13,4 +13,4 @@ Minecraft 統合版（Bedrock）用アドオン。バージョン 1.1.25（min_e
 
 - `bar_addon/behavior_pack/` … ビヘイビアパック（`scripts/main.js` から各 `reusable_*.js` を読み込み、`/rt:` カスタムコマンドを登録）
 - `bar_addon/resource_pack/` … リソースパック（HUD UI、フォント、パーティクル、テクスチャ）
-- 使い方とコマンド一覧は `bar_addon/behavior_pack/explanation.txt` を参照
+- 使い方は `bar_addon/behavior_pack/explanation.txt`、全コマンドと引数の一覧は `bar_addon/COMMANDS.md` を参照
