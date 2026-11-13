@@ -7,7 +7,7 @@ Minecraft 統合版（Bedrock）用アドオン。バージョン 1.1.25（min_e
 
 使用 API: `@minecraft/server` 2.9.0 / `@minecraft/server-ui` 2.0.0
 
-# バーアドオン v1.5.7
+# バーアドオン v1.5.8
 
 `bar_addon/` に収録。タイマー、カウントダウン／カウントアップのバー、割合バー、チーム分けエリアを追加するアドオン（min_engine_version 1.21.80、`@minecraft/server` 2.8.0）。
 

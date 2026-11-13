@@ -20174,6 +20174,56 @@
       }
     ]
   },
+  "rt_boss_slot": {
+    "type": "panel",
+    "size": [
+      182,
+      20
+    ],
+    "visible": false,
+    "bindings": [
+      {
+        "binding_name": "#bar_visible",
+        "binding_type": "collection",
+        "binding_collection_name": "boss_bars",
+        "binding_name_override": "#visible"
+      }
+    ]
+  },
+  "rt_boss_slot_stack": {
+    "type": "stack_panel",
+    "orientation": "vertical",
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "collection_name": "boss_bars",
+    "size": [
+      182,
+      "100%c"
+    ],
+    "controls": [
+      {
+        "slot1@hud.rt_boss_slot": {
+          "collection_index": 0
+        }
+      },
+      {
+        "slot2@hud.rt_boss_slot": {
+          "collection_index": 1
+        }
+      },
+      {
+        "slot3@hud.rt_boss_slot": {
+          "collection_index": 2
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "(not #on_new_death_screen)",
+        "binding_name_override": "#visible"
+      }
+    ]
+  },
   "rt_boss_space": {
     "type": "panel",
     "size": [
@@ -20183,6 +20233,9 @@
     "controls": [
       {
         "probe@hud.rt_boss_probe_grid": {}
+      },
+      {
+        "slots@hud.rt_boss_slot_stack": {}
       },
       {
         "script_pad@hud.rt_boss_pad_stack": {}
