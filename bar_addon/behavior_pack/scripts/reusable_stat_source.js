@@ -1,0 +1,359 @@
+import { system } from "@minecraft/server";
+import {
+  normalizeReusableStatKey,
+  getReusableStoredStat
+} from "./reusable_stat_store.js";
+import { getReusableCurrentStat } from "./reusable_stat_current.js";
+import { getReusableStatCombo } from "./reusable_stat_combo.js";
+import { evaluateStatExpression } from "./reusable_stat_expr.js";
+
+var ALIASES = {
+  kills: "mob_kills",
+  mobkills: "mob_kills",
+  playerkills: "player_kills",
+  hp: "health",
+  xp: "xp.total",
+  level: "xp.level",
+  speed: "speed.blocks_per_second",
+  weight: "inventory.weight",
+  "inventory.total": "inventory.total_items",
+  "inventory.count": "inventory.total_items",
+  "held.durability": "held.durability_remaining",
+  "held.max_durability": "held.durability_max",
+  "container.total": "container.total_items",
+  "target_container.total": "target_container.total_items",
+  totem: "totem_pops"
+};
+
+var currentValueCacheTick = -1;
+var currentValueCache = {};
+
+function tickNow() {
+  try { return Number(system.currentTick) || 0; }
+  catch (e) { return 0; }
+}
+
+function rounded(value) {
+  var number = Number(value);
+  if (!isFinite(number)) return 0;
+  return Math.round(number * 100) / 100;
+}
+
+function playerKey(player) {
+  if (!player) return "";
+  return String(player.id || player.name || "");
+}
+
+export function isReusableStatSource(source) {
+  return String(source || "").trim().toLowerCase().slice(0, 5) === "stat:";
+}
+
+// ---------------------------------------------------------------------------
+// One argument:  stat:<統計>.<対象>.<タグ>      (対象 and タグ are optional)
+//
+//   stat:mob_kills                 mob kills of everybody
+//   stat:mob_kills.red             mob kills of the players tagged red
+//   stat:kills.zombie              zombie kills of everybody
+//   stat:kills.zombie.red          zombie kills of the players tagged red
+//   stat:blocks_broken.stone.red   stone broken by the players tagged red
+//
+// 対象 is the mob / block / item (minecraft. is added automatically).
+// タグ is "all" (everybody), a team color (red ... pink), "team", or any
+// tag given with /tag. Leaving it out also means everybody.
+// ---------------------------------------------------------------------------
+var ID_FAMILIES = [
+  "kills", "killed_by", "damage_dealt", "blocks_broken", "blocks_broken_with",
+  "blocks_placed", "tools_broken", "items_used", "items_picked_up",
+  "items_dropped", "containers_opened", "entity_containers_opened"
+];
+
+// Keys that carry their own dotted tail; the whole text is the key.
+var WHOLE_KEY_PREFIXES = [
+  "kills_by_cause.", "deaths_by_cause.", "damage_dealt_by_cause.",
+  "damage_taken_by_cause.", "healing_by_cause.", "dimension_changes.",
+  "distance.dimension.", "emotes.", "inventory.", "hotbar.", "held.",
+  "equipment.", "armor.", "container.", "target_container.", "item.",
+  "state.", "nearby."
+];
+
+var KNOWN_STAT_KEYS = [
+  "player_kills", "mob_kills", "deaths", "items_dropped", "items_dropped_stacks",
+  "items_picked_up", "items_picked_up_stacks", "damage_dealt", "hits_dealt",
+  "max_single_hit", "damage_taken", "hits_taken", "max_damage_taken",
+  "blocks_broken", "tools_broken", "blocks_placed", "items_used",
+  "healing_total", "healing_events", "totem_pops", "dimension_changes",
+  "emotes", "jumps", "sneak_presses", "joins", "respawns",
+  "containers_opened", "entity_containers_opened",
+  "play_time_ticks", "play_time_seconds", "play_time_minutes", "play_time_hours",
+  "life_time_ticks", "life_time_seconds", "longest_life_ticks", "longest_life_seconds",
+  "session_time_ticks", "session_time_seconds",
+  "longest_session_ticks", "longest_session_seconds",
+  "highest_xp_level", "highest_xp_total", "highest_y", "lowest_y", "max_speed_bps",
+  "distance", "distance.horizontal", "distance.ascent", "distance.descent",
+  "distance.gliding", "distance.sprinting", "distance.swimming", "distance.in_water",
+  "health", "health_max", "health_percent", "selected_slot",
+  "xp.total", "xp.level", "xp.at_current_level", "xp.needed_next_level",
+  "position.x", "position.y", "position.z",
+  "speed.blocks_per_second", "speed.horizontal_bps",
+  "velocity.x", "velocity.y", "velocity.z",
+  "light.level", "light.sky", "block.redstone_power"
+];
+
+var TEAM_WORDS = [
+  "red", "blue", "yellow", "green", "cyan", "purple", "orange", "pink", "team",
+  "all"
+];
+
+function resolveAlias(key) {
+  return ALIASES[key] || key;
+}
+
+// Returns { key: "kills.minecraft.zombie", tag: "red" }.
+function parseSingleStat(source) {
+  var text = String(source === undefined || source === null ? "" : source).trim();
+  if (text.toLowerCase().slice(0, 5) === "stat:") text = text.slice(5);
+
+  var segs = [];
+  var rawSegs = text.split(".");
+  for (var i = 0; i < rawSegs.length; i++) {
+    var seg = rawSegs[i].trim();
+    if (seg) segs.push(seg);
+  }
+
+  if (segs.length <= 0) return { key: "", tag: "" };
+
+  var head = normalizeReusableStatKey(segs[0]);
+
+  // 1) 統計.対象(.タグ)  where 対象 is a mob / block / item
+  if (ID_FAMILIES.indexOf(head) >= 0) {
+    var rest = segs.slice(1);
+
+    if (rest.length === 0) return { key: resolveAlias(head), tag: "" };
+
+    // kills.red -> all mob kills of the red team
+    if (rest.length === 1 && TEAM_WORDS.indexOf(rest[0].toLowerCase()) >= 0) {
+      return { key: resolveAlias(head), tag: rest[0] };
+    }
+
+    var id;
+    var tagParts;
+    if (rest[0].toLowerCase() === "minecraft" && rest.length >= 2) {
+      id = "minecraft." + rest[1];
+      tagParts = rest.slice(2);
+    } else {
+      id = rest[0];
+      tagParts = rest.slice(1);
+    }
+
+    id = normalizeReusableStatKey(id);
+    if (id.indexOf(".") < 0) id = "minecraft." + id;
+
+    return { key: head + "." + id, tag: tagParts.join(".") };
+  }
+
+  // 2) keys with their own dotted tail: the whole text is the key
+  var whole = normalizeReusableStatKey(text);
+  for (var w = 0; w < WHOLE_KEY_PREFIXES.length; w++) {
+    if (whole.slice(0, WHOLE_KEY_PREFIXES[w].length) === WHOLE_KEY_PREFIXES[w]) {
+      return { key: resolveAlias(whole), tag: "" };
+    }
+  }
+
+  // 3) a known key (longest match); whatever follows is the タグ
+  for (var k = segs.length; k >= 1; k--) {
+    var candidate = resolveAlias(normalizeReusableStatKey(segs.slice(0, k).join(".")));
+    if (KNOWN_STAT_KEYS.indexOf(candidate) >= 0) {
+      return { key: candidate, tag: segs.slice(k).join(".") };
+    }
+  }
+
+  // 4) anything else: same as before, the whole text is the key
+  return { key: resolveAlias(whole), tag: "" };
+}
+
+function statTextSegments(source) {
+  var text = String(source === undefined || source === null ? "" : source).trim();
+  if (text.toLowerCase().slice(0, 5) === "stat:") text = text.slice(5);
+
+  var segs = [];
+  var raw = text.split(".");
+  for (var i = 0; i < raw.length; i++) {
+    var seg = raw[i].trim();
+    if (seg) segs.push(seg);
+  }
+  return segs;
+}
+
+// Returns { key, keys, tag, items }. For a named stat created with /rt:stat,
+// keys lists every stat it uses and items is its formula.
+export function parseReusableStatSource(source) {
+  var segs = statTextSegments(source);
+
+  if (segs.length > 0) {
+    var combo = getReusableStatCombo(segs[0]);
+    if (combo) {
+      return {
+        key: combo.keys[0],
+        keys: combo.keys,
+        items: combo.items,
+        tag: segs.slice(1).join(".")
+      };
+    }
+  }
+
+  var one = parseSingleStat(source);
+  return { key: one.key, keys: [one.key], items: undefined, tag: one.tag };
+}
+
+export function reusableStatKeyFromSource(source) {
+  return parseReusableStatSource(source).key;
+}
+
+// ---------------------------------------------------------------------------
+// /rt:stat helpers
+// ---------------------------------------------------------------------------
+function statKeyIsKnown(key) {
+  if (KNOWN_STAT_KEYS.indexOf(key) >= 0) return true;
+
+  for (var i = 0; i < ID_FAMILIES.length; i++) {
+    if (key.slice(0, ID_FAMILIES[i].length + 1) === ID_FAMILIES[i] + ".") return true;
+  }
+  for (var w = 0; w < WHOLE_KEY_PREFIXES.length; w++) {
+    if (key.slice(0, WHOLE_KEY_PREFIXES[w].length) === WHOLE_KEY_PREFIXES[w]) return true;
+  }
+  return false;
+}
+
+// Names that already mean something as the first part of stat:...
+function builtInStatHeads() {
+  var heads = ["list", "delete"].concat(TEAM_WORDS, ID_FAMILIES);
+
+  for (var i = 0; i < KNOWN_STAT_KEYS.length; i++) {
+    heads.push(KNOWN_STAT_KEYS[i].split(".")[0]);
+  }
+  for (var w = 0; w < WHOLE_KEY_PREFIXES.length; w++) {
+    heads.push(WHOLE_KEY_PREFIXES[w].replace(/\.$/, ""));
+  }
+  for (var alias in ALIASES) {
+    if (Object.prototype.hasOwnProperty.call(ALIASES, alias)) {
+      heads.push(alias.split(".")[0]);
+    }
+  }
+  return heads;
+}
+
+// Returns "" when the name can be used, otherwise a short reason.
+export function reusableStatComboNameError(name) {
+  var text = String(name === undefined || name === null ? "" : name).trim();
+
+  if (!text) return "Name is empty";
+  if (text.length > 24) return "Name is too long (24 characters at most)";
+  if (/[\s.:+,=@\/\\"']/.test(text)) {
+    return "Name cannot contain spaces or . : + , = @ / \\ quotes";
+  }
+  if (builtInStatHeads().indexOf(text.toLowerCase()) >= 0) {
+    return "'" + text + "' cannot be used (reserved word or built-in stat name). Choose another name";
+  }
+  return "";
+}
+
+// Checks one member of a named stat. Returns { ok, key, error }.
+export function reusableStatComboMember(spec) {
+  var segs = statTextSegments(spec);
+  if (segs.length <= 0) return { ok: false, key: "", error: "Stat is empty" };
+
+  if (getReusableStatCombo(segs[0])) {
+    return {
+      ok: false,
+      key: "",
+      error: "'" + segs[0] + "' is a named stat. Put built-in stats here"
+    };
+  }
+
+  var one = parseSingleStat(spec);
+  if (one.tag) {
+    return {
+      ok: false,
+      key: "",
+      error: "No tag here ('" + String(spec) + "'). Add the tag when you use it: stat:name.tag"
+    };
+  }
+  if (!one.key || !statKeyIsKnown(one.key)) {
+    return { ok: false, key: "", error: "Unknown stat '" + String(spec) + "'" };
+  }
+
+  return { ok: true, key: one.key, error: "" };
+}
+
+function derivedStoredValue(player, key) {
+  if (key === "play_time_seconds") {
+    return getReusableStoredStat(player, "play_time_ticks", 0) / 20;
+  }
+  if (key === "play_time_minutes") {
+    return getReusableStoredStat(player, "play_time_ticks", 0) / 1200;
+  }
+  if (key === "play_time_hours") {
+    return getReusableStoredStat(player, "play_time_ticks", 0) / 72000;
+  }
+  if (key === "life_time_seconds") {
+    return getReusableStoredStat(player, "life_time_ticks", 0) / 20;
+  }
+  if (key === "longest_life_seconds") {
+    return getReusableStoredStat(player, "longest_life_ticks", 0) / 20;
+  }
+  if (key === "session_time_seconds") {
+    return getReusableStoredStat(player, "session_time_ticks", 0) / 20;
+  }
+  if (key === "longest_session_seconds") {
+    return getReusableStoredStat(player, "longest_session_ticks", 0) / 20;
+  }
+  return undefined;
+}
+
+function cachedCurrentValue(player, key) {
+  var tick = tickNow();
+  if (tick !== currentValueCacheTick) {
+    currentValueCacheTick = tick;
+    currentValueCache = {};
+  }
+
+  var cacheKey = playerKey(player) + "|" + key;
+  if (Object.prototype.hasOwnProperty.call(currentValueCache, cacheKey)) {
+    return currentValueCache[cacheKey];
+  }
+
+  var value = getReusableCurrentStat(player, key);
+  currentValueCache[cacheKey] = value;
+  return value;
+}
+
+export function getReusableStatValue(player, rawKey) {
+  var key = reusableStatKeyFromSource(rawKey);
+
+  var current = cachedCurrentValue(player, key);
+  if (current !== undefined) return rounded(current);
+
+  var derived = derivedStoredValue(player, key);
+  if (derived !== undefined) return rounded(derived);
+
+  return rounded(getReusableStoredStat(player, key, 0));
+}
+
+export function getReusableStatSourceValue(player, source) {
+  if (!isReusableStatSource(source)) return undefined;
+
+  var parsed = parseReusableStatSource(source);
+
+  if (parsed.items) {
+    return rounded(evaluateStatExpression(parsed.items, function (key) {
+      return getReusableStatValue(player, key);
+    }));
+  }
+
+  return rounded(Number(getReusableStatValue(player, parsed.key)) || 0);
+}
+
+export function reusableSourceLabel(source) {
+  if (!isReusableStatSource(source)) return String(source || "");
+  return reusableStatKeyFromSource(source);
+}

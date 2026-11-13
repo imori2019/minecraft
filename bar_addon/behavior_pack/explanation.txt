@@ -1,0 +1,366 @@
+バーアドオン - BP（ビヘイビアーパック） v1.5.7
+
+【概要】
+割合バー、カウントダウン、カウントアップ、タイマー、チーム分けエリアを使うためのアドオンです。
+
+【導入】
+1. BP と RP の両方をワールドに適用してください。
+2. ワールドを開き直すと「バーアドオン loaded」と表示されます。
+3. チーム分けエリア用アイテムは /give @s bar_addon:team_area_tool で取得できます。
+
+【共通の注意】
+・コマンドはチートが有効で、GameDirectors 以上の権限が必要です。
+・Bedrockのカスタムコマンドは namespace:command 形式です。/bar ではなく /rt: から始めてください。
+・コマンドが出ない時は、ワールドを一度閉じて開き直してください。
+・コマンドの引数が増えた版に差し替えた時は、/reload ではなく、必ずワールドを閉じて開き直してください。
+  /reload では、コマンドの引数の定義は変わらず、新しい引数を付けるとエラーになります。
+・バーを動かす前に、必ず下の「バーの種類」のどれかで設定してください。
+
+【チーム分けエリア】
+・アイテムを使うと、8色のエリアを作ります。もう一度使うと削除します。
+・色のエリアに乗ると、その色のチームタグになり、別色のタグは外れます。
+・/rt:base set [2-8]   エリアを作成（色数を省略すると8色）
+・/rt:base remove      エリアを削除
+・/rt:base info        状態を表示
+
+【チームコマンド】
+/rt:red /rt:blue /rt:yellow /rt:green /rt:cyan /rt:purple /rt:orange /rt:pink [セレクタ]
+例: /rt:red @s    /rt:blue @a[r=5]
+
+【バーの種類】
+1) タイマー（バー＋時間表示）
+   /rt:timer 秒数 [ラベル] [digits] [開始メッセージ] [終了メッセージ] [style]
+   例: /rt:timer 60 残り時間
+       /rt:timer 60 残り時間 off     数字を出さない（ラベルはバーの上にタイトルとして表示）
+       /rt:timer 60 0 off            数字もラベルも出さない
+       /rt:timer 60 残り時間 on 開始 終了
+   /rt:timer 0                       表示中のタイマーの数字とラベルを両方消す
+   ・digits: on（既定）/ off
+   ・時計の表示は 99:59 まで（5999 秒）です。それより長いタイマーは、digits を off にすると作れます。
+   ・ラベル・開始メッセージ・終了メッセージは、0 を指定すると「なし」になります
+     （後ろの引数だけ指定したい時に使います）。
+
+2) 時間連動のバー
+   /rt:countdownbar 秒数 [ラベル] [digits] [開始メッセージ] [終了メッセージ] [最大] [up|down] [style]
+   /rt:countupbar   秒数 [ラベル] [digits] [開始メッセージ] [終了メッセージ] [最大] [up|down] [style]
+   ・countdownbar はバーが減少、countupbar はバーが増加します。
+   ・最大   : バーの段階数（省略時は秒数と同じ）。RT Bar Value / RT Bar Max のスコアにも出力されます。
+   ・up|down: 数字の向き（省略時は down）。
+   ・数字を表示する時は 5999 秒（99:59）までです。長いバーは digits を off にしてください。
+   例: /rt:countdownbar 60 残り
+       /rt:countdownbar 60 残り off
+       /rt:countdownbar 60 残り on 開始 終了 50 down
+       /rt:countupbar   60 経過 on 0 終了 50 up
+
+3) スコアボード連動のカウンター
+   /rt:countdown 使う関数 最大数 タイトル 表示 [色]
+   /rt:countup   使う関数 最大数 タイトル 表示 [色]
+   ・タイトル: - または 0 でタイトルなし
+   ・表示    : count（現在値/最大値）, none（数字なし）, d秒（時計・減少）, a秒（時計・増加）
+   ・色      : blue red green yellow purple orange white、または xp（バニラの経験値バーの見た目）
+   ・使う関数: スコアボード名のほか、stat:mob_kills のような統計も指定できます（下の【統計】）
+
+4) 割合バー
+   /rt:ratio 使う関数 チーム タイトル [秒数]
+   ・チーム: 1～8（赤・青・黄・緑・水色・紫・橙・桃の先頭から数える）, all, または red_blue のような色名
+   ・秒数を付けた時だけ時計が出ます。付けなければ数字は出ません。秒数は 5999 秒（99:59）までです。
+   ・使う関数には、カウンターと同じく stat: の統計も指定できます。
+
+【操作】
+/rt:play  開始     /rt:stop  一時停止     /rt:remove  バーを削除
+/rt:hudtest  HUDのテスト表示
+
+【統計】（モブを倒した数など）
+使う関数の代わりに、次の1つの引数で指定します。
+    stat:統計.対象.タグ
+・統計 : 何を数えるか   mob_kills（モブを倒した数）, player_kills, deaths, blocks_broken など
+・対象 : どのモブ・ブロック・アイテムか（省略可。minecraft. は付けなくて構いません）
+・タグ : 誰の分を数えるか（省略可）
+    全員              all を書く（省略しても同じ）
+    チーム            チームの色（red など）、または team（チームに入っている人全員）
+    特定の人          その人にタグを付けて（/tag 名前 add vip）、タグ名を書く
+                      （1人でも数人でも、同じタグを付ければ指定できます）
+例: /rt:countup stat:mob_kills 20 討伐 count                 全員がモブを倒した数
+    /rt:countup stat:mob_kills.all 20 討伐 count             同じ（全員を明示）
+    /rt:countup stat:mob_kills.vip 20 討伐 count             タグ vip の人だけがモブを倒した数
+    /rt:countup stat:mob_kills.red 20 討伐 count             赤チームがモブを倒した数
+    /rt:countup stat:kills.zombie 20 ゾンビ count             全員がゾンビを倒した数
+    /rt:countup stat:kills.zombie.red 20 ゾンビ count         赤チームがゾンビを倒した数
+    /rt:countup stat:kills.zombie.vip 20 ゾンビ count         タグ vip の人がゾンビを倒した数
+    /rt:countup stat:blocks_broken.stone.red 100 石 count     赤チームが石を壊した数
+    /rt:ratio stat:kills.zombie red_blue 討伐対決             赤と青のゾンビ討伐数の割合
+・kills.red のように、対象を省略してタグだけを付けることもできます（モブ全体の討伐数）。
+・タグに all / team / red / blue / yellow / green / cyan / purple / orange / pink と書いた場合は、
+  上の意味になります。自分で付けたタグがこれらと同じ綴りの場合は使えません。
+  プレイヤー名では指定できません（タグを使ってください）。
+・主な統計
+    討伐    : mob_kills（別名 kills）, player_kills, kills.<モブ名>, deaths, killed_by.<モブ名>
+    ダメージ: damage_dealt, damage_taken, hits_dealt, hits_taken, max_single_hit
+    ブロック: blocks_broken, blocks_placed, tools_broken（.<ブロック名> で個別指定）
+    アイテム: items_used, items_picked_up, items_dropped（.<アイテム名> で個別指定）
+    移動    : distance, distance.horizontal, distance.sprinting, distance.swimming, jumps など
+    時間    : play_time_seconds, play_time_minutes, life_time_seconds, session_time_seconds
+    リアルタイム値: health, xp.level, speed.blocks_per_second, inventory.total_items など
+      （inventory. / held. / armor. などで始まるものは、タグを付けられません）
+※ /rt:play で、数える対象の人のその統計が 0 に戻ります（数えない人の記録は残ります）。
+※ 途中参加した人も、数える対象ならその統計が 0 から始まります。
+※ 統計はバーを動かしていない間も記録され続けます。
+※ 統計は軽くするためにまとめて保存しています（5秒ごと、と退出時）。ゲームが落ちた場合、最後の数秒の記録が失われることがあります。
+※ 存在しない名前を書いても、エラーにならず 0 のままです。
+
+【計算して名前をつけた統計】（足す・引く・掛ける・割る など）
+/rt:stat 名前 式          統計や数字を計算する式に、名前をつけます
+/rt:stat 名前 delete      その名前を削除
+/rt:stat list             作った名前と式の一覧
+
+・作った名前は、stat: の統計の位置に書きます。タグも付けられます。
+    /rt:stat B kills.zombie - killed_by.zombie
+    /rt:countup stat:B 20 ゾンビ戦 count          全員の分
+    /rt:countup stat:B.red 20 ゾンビ戦 count      赤チームの分
+    /rt:ratio stat:B red_blue ゾンビ戦             赤と青の割合
+
+【式の書き方】
+式は「統計・数字・演算・関数」を並べて書きます。2つの書き方があり、混ぜて使えます。
+
+■ 1) 演算で並べる
+    kills.zombie + killed_by.zombie * 2
+  統計    kills.zombie  killed_by.zombie  deaths  mob_kills など（【統計】と同じ書き方。タグは付けられません）
+  数字    2  0.5  -1     定数 pi  true(=1)  false(=0)
+  演算（値と値の間）
+      +  足す    -  引く    *  掛ける    /  割る    %  割った余り    ^  累乗
+      min  小さい方    max  大きい方    every  で割った回数（切り捨て）
+  比較（結果は 1 か 0）
+      >  より大きい    <  より小さい    ge  以上    le  以下    eq  等しい    ne または <>  等しくない
+  論理（結果は 1 か 0）
+      and  どちらも 0 でない    or  どちらかが 0 でない
+  切り替え
+      then 値            直前までの結果が 0 でなければ「値」に、0 なら 0 にする
+      then 値 else 値    0 でなければ then の値、0 なら else の値にする
+  値の後ろに付ける言葉
+      abs  絶対値    floor  切り捨て    ceil  切り上げ    round  四捨五入    sqrt  平方根
+      sign  符号（-1・0・1）    not  0 なら 1、0 以外なら 0
+
+■ 2) Excel のように関数で書く
+    関数名(値, 値, ...)        関数名は大文字でも小文字でも構いません。
+    ROUND(kills.zombie / 3, 1)
+    IF(kills.zombie > 10, 100, 0)
+    SUM(kills.zombie, killed_by.zombie, deaths)
+  かっこの中の「値」は、それぞれが1つの式です（関数の入れ子もできます）。
+    IF(kills.zombie > 20, 3, IF(kills.zombie > 10, 2, 1))
+
+■ 共通のルール
+・計算は、並べた順に、左から順番に行います。掛け算を先にする、といった優先順位はありません（Excel とは違います）。
+    kills.zombie + killed_by.zombie * 2     →  (倒した数 + やられた数) × 2
+    kills.zombie + (killed_by.zombie * 2)   →  かっこで先に計算すると、倒した数 + やられた数 × 2
+・( ) で囲んだ部分を先に計算できます（8段まで）。条件を組み合わせる時は、かっこで囲んでください。
+    (kills.zombie > 10) and (killed_by.zombie eq 0) then 100 else 0     →  10 体を超えて、1度もやられていなければ 100
+    ※ かっこなしの「kills.zombie > 10 and killed_by.zombie eq 0 then 100 else 0」は、
+       ((倒した数 > 10) and やられた数) eq 0 の順に計算されるので、意図と違う結果になります。
+・マイナスの値は -kills.zombie、-(kills.zombie + 2) のように書けます。
+・「=」の記号は使えません。以上・以下・等しいは ge / le / eq / ne（または <>）を使ってください。
+・書き方は3通りで、どれでも同じ意味になります。
+    /rt:stat B kills.zombie - killed_by.zombie        空白で区切る（7個まで）
+    /rt:stat B kills.zombie-killed_by.zombie          空白なしでつなげる
+    /rt:stat B "kills.zombie - killed_by.zombie"       全体を "" で囲む（長い式・関数はこちらが確実です）
+・比較の結果は、成り立てば 1、成り立たなければ 0 です。0 以外は「成り立つ」として扱います。
+
+【関数の一覧】（数を使う計算です。結果は Excel と同じです）
+  数学
+    ABS(x) 絶対値        SIGN(x) 符号        SQRT(x) 平方根        EXP(x) e の x 乗
+    LN(x) 自然対数        LOG10(x) 常用対数        LOG(x, 底) 対数（底を省略すると 10）
+    POWER(x, y) x の y 乗        MOD(x, y) 割った余り（Excel と同じ。負の数は y の符号に合わせる）
+    QUOTIENT(x, y) 割った商（小数点以下を切り捨て）
+  丸め
+    INT(x) 切り捨て（小さい方の整数へ）        TRUNC(x, 桁) 桁で切り捨て（0 に近づける）
+    ROUND(x, 桁) 四捨五入        ROUNDUP(x, 桁) 切り上げ（0 から遠ざける）
+    ROUNDDOWN(x, 桁) 切り捨て（0 に近づける）        ※ 桁を省略すると 0。マイナスの桁は 10 や 100 の位。
+    CEILING(x, 基準) 基準の倍数へ切り上げ        FLOOR(x, 基準) 基準の倍数へ切り捨て
+    MROUND(x, 基準) 基準の倍数に丸める        EVEN(x) 偶数に切り上げ        ODD(x) 奇数に切り上げ
+  数え上げ
+    FACT(n) 階乗        COMBIN(n, k) 組み合わせ        PERMUT(n, k) 順列
+    GCD(...) 最大公約数        LCM(...) 最小公倍数
+  角度
+    PI() 円周率        RADIANS(度) / DEGREES(ラジアン)
+    SIN COS TAN ASIN ACOS ATAN ATAN2(x, y) SINH COSH TANH
+  複数の値（32個まで）
+    SUM 合計    PRODUCT 積    SUMSQ 2乗の合計    AVERAGE 平均    MEDIAN 中央値    MAX 最大    MIN 最小
+    STDEV / STDEVP 標準偏差（標本／母集団）    VAR / VARP 分散（標本／母集団）
+  条件・選択
+    IF(条件, 真の値, 偽の値)        偽の値を省略すると 0
+    IFS(条件1, 値1, 条件2, 値2, ...)        最初に成り立った条件の値（どれも成り立たなければ 0）
+    SWITCH(式, 値1, 結果1, 値2, 結果2, ... [, どれでもない時])
+    CHOOSE(番号, 値1, 値2, ...)        番号は 1 から
+    AND(...) OR(...) XOR(...) NOT(x) TRUE() FALSE() ISEVEN(x) ISODD(x)
+  ※ 文字・日付・セルの範囲・乱数（RAND）・検索（VLOOKUP）など、数を使わないものはありません。
+  ※ Excel との違い: 計算は左から順（優先順位なし）／0 で割るとエラーではなく 0／
+     % は「割った余り」／比較の結果は TRUE・FALSE ではなく 1・0。
+
+【数字や条件で変化をつける例】
+  計算
+    kills.zombie * 2 + 10                       2倍して 10 足す
+    kills.zombie - 10 max 0                     10 引くが、0 より下にはしない（MAX(kills.zombie - 10, 0) も同じ）
+    MIN(kills.zombie, 20)                       20 を上限にする
+    kills.zombie % 5                            5 で割った余り
+    ROUND(kills.zombie / 3, 1)                  3 で割って小数第1位まで
+    SQRT(kills.zombie * 4)                      平方根
+    killed_by.zombie - kills.zombie abs         差の絶対値
+  条件で値が切り替わる
+    IF(kills.zombie > 10, 100, 0)               倒した数が 10 を超えたら 100、超えなければ 0
+    kills.zombie > 10 then 100 else 0           同じ（演算で並べる書き方）
+    IF(deaths eq 0, 10, 0)                      1度もやられていなければ 10
+    IF(kills.zombie > killed_by.zombie, kills.zombie, 0)   勝ち越している時だけ倒した数
+  段階・区切り
+    kills.zombie every 5                        5体倒すごとに 1（INT(kills.zombie / 5) も同じ）
+    IFS(kills.zombie > 20, 3, kills.zombie > 10, 2, 1, 1)      21体以上 3、11体以上 2、それ以外 1
+    SUM(kills.zombie > 10, kills.zombie > 20, kills.zombie > 30)   いくつの条件を超えたか（0〜3）
+    SWITCH(killed_by.zombie, 0, 10, 1, 5, 0)    やられた数が 0 なら 10、1 なら 5、それ以外は 0
+  いくつかの統計
+    SUM(kills.zombie, killed_by.zombie, deaths)      合計
+    AVERAGE(kills.zombie, killed_by.zombie)          平均
+    MAX(kills.zombie, killed_by.zombie * 10)         大きい方
+
+【式の決まり】
+・式は「1人ずつ」計算し、その結果を数える対象の人全員ぶん合計します。
+    （引き算・足し算は合計と同じ結果ですが、掛け算・min・max・abs・条件などは1人ずつ行います）
+・0 で割った時と、0 で割った余りは 0 になります。小数は、バーの表示では切り捨てです。
+・結果がマイナスになる時、バーの表示は 0 です（割合バーでは 0 として扱います）。
+・統計は32個まで、式は600文字まで、かっこ・関数の入れ子は8段までです。
+・名前に使えない文字: 空白 . : + , = @ / \ " '    24文字までで、日本語も使えます。
+・組み込みの統計名（kills, mob_kills, xp など）やチームの色、list、delete は名前にできません。
+・名前の中に、別の名前をつけた統計を入れることはできません。
+・同じ名前でもう一度実行すると、式を置き換えます。
+・定義はワールドに保存され、ワールドを開き直しても残ります（/rt:reset では消えません）。
+・式の中の「-」は引き算です。名前に - を含むモブ（追加パックのモブなど）は式に使えません。
+※ /rt:play で、式に使った統計の「全部」が 0 に戻ります（数える対象の人のぶん）。
+   例の B なら、その人のゾンビを倒した数とゾンビにやられた数の記録が両方 0 に戻ります。
+
+【経験値バーの見た目（xp）】
+バーを、バニラの経験値バーの見た目で表示できます（位置は、これまでのバーと同じ画面の上です）。
+・タイマー・時間連動のバー: 最後の引数 style に xp を書きます（boss はこれまでのボスバー風。省略時も同じ）。
+    /rt:timer 60 残り on 0 0 xp
+    /rt:countdownbar 60 残り on 0 0 60 down xp
+・カウンター: 色に xp を書きます。
+    /rt:countup test_count 100 テスト count xp
+    /rt:countdown stat:mob_kills 20 討伐 count xp
+・割合バー（/rt:ratio）は、2色以上のチームを分けて見せるものなので、経験値バーの見た目はありません。
+・作り: バニラの経験値バーと同じ3枚のテクスチャ（空の部分・緑の塗り・目盛り）を、ゲーム本体のものを名前で呼び出して
+  使っています。塗りの幅は、ボスバーと同じく 1px ずつの182段階で切り替えます。
+  目盛りは、バニラと同じく、塗りとは別に、バー全体（空の部分も）に重ねています。
+・色は変えられません（バニラの経験値バーの緑です）。ラベル・タイトル・時計の数字は、これまでと同じ白です。
+・ほかのテクスチャパックが経験値バーの絵を変えている場合は、その絵になります。
+・本物の経験値バー（画面下）には、何も影響しません。
+・見た目はゲーム内で未確認です。戻す時は、style を省略するか boss にします（カウンターは色を変えます）。
+
+【数字を消す方法まとめ】
+・タイマー / 時間連動のバー : digits を off にする（ラベルは残る）。/rt:timer 0 ならラベルも消える
+・カウンター               : 表示を none にする
+・割合バー                 : 秒数を付けない
+※ バーを設定し直すと、数字は表示に戻ります。off は設定のたびに付けてください。
+
+【表示と出力について】
+・バーの表示は5秒ごとに送り直しています。/title コマンドなどで表示が消されても、5秒以内に戻ります。
+・コマンドブロック用のスコアボード（rt_timer、rt_bar、rt_ratio など）は、値が変わった時だけ書き込みます。
+  手で書き換えた値は、5秒以内にアドオンの値へ戻ります。名前に event が付くものは毎回書き込みます。
+・カウンターのバーの長さは、表示している数字（小数点以下は切り捨て）と同じ値で決まります。
+
+【表示の位置とボスバー】
+バーの文字の大きさと位置を、バニラのボスバーに合わせました。ボスバーが出ている時は、その下に表示されます。
+・見た目（バニラのボスバーに合わせた値）
+    文字の大きさ  1.5倍 → 等倍（時計の数字・ラベル・カウンターのタイトル）
+    文字の位置    上端から 1px → 2px
+    バーの位置    上端から 14px → 12px
+    バーの大きさ  182×5（変更なし）
+・ボスバーを避ける仕組み（1つのボスバーにつき、20px 下げます。バニラのボスバーを複数並べた時と同じ間隔です）
+    1) 自動検知（実験）  ゲームのボスバー全般（バニラ・カスタムとも）を、リソースパックが自分で数えます。
+    2) スクリプトによる検知（補助）  次のものを1秒ごとに調べます。
+         ・エンダードラゴン … 同じディメンションにいる全員
+         ・ウィザー … 64ブロック以内
+         ・エンティティのタグ rt_boss … 64ブロック以内（カスタムボス用）
+         ・エンティティのファミリー boss … 64ブロック以内（カスタムボス用）
+    3) 手動  プレイヤーのタグ rt_pad1 / rt_pad2 / rt_pad3 で、その段数ぶん常に空けます。
+         ボスバーではない、タイトル表示のカスタムバーなどの下に出したい時に使います。
+    ・自動検知とスクリプトの検知は足し算にならず、大きい方の段数だけ下がります。最大3段までです。
+    ・ボスバーが消えると、元の位置に戻ります。
+    例: カスタムボスに目印を付ける
+        /tag @e[type=mypack:giant] add rt_boss
+        プレイヤーの手動指定 /tag @a add rt_pad1
+・バニラのボスバーと同じ余白: 画面がタッチ操作の時などに、バニラはボスバーを下げます。バーも同じ量だけ下がります。
+・うまくいかない時
+    ボスバーと重なる、または、ボスバーが無いのに大きな空白ができる場合は、zip にある次のフォルダのファイルを
+    RP/ui に上書きしてください。
+      自動検知を切る用/ui/hud_screen.json   … 自動検知だけを切ります（スクリプトの検知は残ります）
+      旧レイアウトに戻す用/ui/ の3ファイル   … 文字の大きさ・位置・ボスバー対応をすべて元に戻します
+・確かめ方: クリエイティブで /summon wither を実行し、タイマーを動かしておきます（/kill @e[type=wither] で消せます）。
+
+【ゲーム管理】
+/rt:game start|stop|reset   reset はバー設定とチームを残してリセット
+/rt:reset                   アドオンのワールド状態を完全に初期化
+/rt:debug                   実行状態を表示
+
+【/rt:bar の廃止】
+/rt:bar set timer 60 on ラベル 開始 終了            → /rt:timer 60 ラベル on 開始 終了
+/rt:bar set countdown 50 ラベル 開始 終了 timer 60   → /rt:countdownbar 60 ラベル on 開始 終了 50 down
+/rt:bar set countup 50 ラベル 開始 終了 timerup 60   → /rt:countupbar 60 ラベル on 開始 終了 50 up
+/rt:bar set countdownbar 60 ラベル                  → /rt:countdownbar 60 ラベル
+/rt:bar play / stop / remove                        → /rt:play / /rt:stop / /rt:remove
+/rt:bar info                                        → /rt:debug
+
+【テスト用コピペ】
+/give @s bar_addon:team_area_tool
+/rt:base set
+/rt:red @s
+/tag @s list
+/rt:base remove
+
+/rt:timer 60 テスト
+/rt:play
+/rt:remove
+
+/rt:timer 60 テスト off
+/rt:play
+/rt:remove
+
+/rt:countup test_count 100 テスト count xp
+/rt:play
+/rt:remove
+
+/rt:countdownbar 60 残り off
+/rt:play
+/rt:remove
+
+/scoreboard objectives add test_count dummy
+/scoreboard players set @s test_count 0
+/rt:countup test_count 100 テスト count
+/rt:play
+/scoreboard players add @s test_count 10
+/rt:stop
+/rt:remove
+
+/scoreboard objectives add team_count dummy
+/scoreboard players set @a team_count 0
+/rt:red @s
+/rt:ratio team_count red_blue テスト
+/rt:play
+/scoreboard players add @s team_count 10
+/rt:remove
+
+/rt:red @s
+/rt:countup stat:kills.zombie.red 10 ゾンビ count
+/rt:play
+/rt:remove
+
+/rt:stat B kills.zombie - killed_by.zombie
+/rt:stat E kills.zombie + killed_by.zombie * 2
+/rt:stat H kills.zombie - 1 max 0
+/rt:stat BONUS kills.zombie > 10 then 100 else 0
+/rt:stat TIER (kills.zombie > 10) + (kills.zombie > 20)
+/rt:stat P kills.zombie every 5
+/rt:stat X1 "IF(kills.zombie > 20, 3, IF(kills.zombie > 10, 2, 1))"
+/rt:stat X2 "ROUND(SQRT(kills.zombie * 4), 1)"
+/rt:stat X3 "SUM(kills.zombie, killed_by.zombie, deaths)"
+/rt:stat list
+/rt:countup stat:B.red 10 ゾンビ戦 count
+/rt:play
+/rt:remove
+/rt:stat B delete
+/rt:hudtest

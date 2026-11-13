@@ -1,0 +1,34 @@
+{
+  "format_version": "1.20.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "bar_addon:team_area_tool",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:max_stack_size": 1,
+      "minecraft:icon": {
+        "texture": "bar_addon_team_area_tool"
+      },
+      "minecraft:display_name": {
+        "value": "チーム分けエリア"
+      },
+      "minecraft:hover_text_color": "aqua",
+      "minecraft:interact_button": true,
+      "minecraft:cooldown": {
+        "category": "team_area_tool",
+        "duration": 0.5
+      },
+      "minecraft:use_animation": "bow",
+      "minecraft:use_modifiers": {
+        "use_duration": 0.05,
+        "movement_modifier": 1
+      },
+      "minecraft:hand_equipped": {
+        "value": false
+      }
+    }
+  }
+}

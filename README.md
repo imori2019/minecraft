@@ -6,3 +6,11 @@ Minecraft 統合版（Bedrock）用アドオン。バージョン 1.1.25（min_e
 - `resource_pack/` … リソースパック（ショップUI、テクスチャ）
 
 使用 API: `@minecraft/server` 2.9.0 / `@minecraft/server-ui` 2.0.0
+
+# バーアドオン v1.5.7
+
+`bar_addon/` に収録。タイマー、カウントダウン／カウントアップのバー、割合バー、チーム分けエリアを追加するアドオン（min_engine_version 1.21.80、`@minecraft/server` 2.8.0）。
+
+- `bar_addon/behavior_pack/` … ビヘイビアパック（`scripts/main.js` から各 `reusable_*.js` を読み込み、`/rt:` カスタムコマンドを登録）
+- `bar_addon/resource_pack/` … リソースパック（HUD UI、フォント、パーティクル、テクスチャ）
+- 使い方とコマンド一覧は `bar_addon/behavior_pack/explanation.txt` を参照

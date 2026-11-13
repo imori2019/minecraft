@@ -1,0 +1,60 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "バーアドオン BP",
+    "description": "タイマー、カウンターバー（アップ/ダウン）、割合バーの3系統に分離したビヘイビアーパック。",
+    "uuid": "71aaefa6-3663-4831-9b71-c830d56dbd54",
+    "version": [
+      1,
+      5,
+      7
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "7c66c492-4186-44fa-aac1-56d607d82a02",
+      "entry": "scripts/main.js",
+      "version": [
+        1,
+        5,
+        7
+      ]
+    },
+    {
+      "description": "Bar addon data module.",
+      "type": "data",
+      "uuid": "d757ef4e-3004-4e2e-8110-cbf06c8259d3",
+      "version": [
+        1,
+        5,
+        7
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "d505d890-be2b-4c9c-922b-1ddfc5eba769",
+      "version": [
+        1,
+        5,
+        7
+      ]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.8.0"
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "imori"
+    ]
+  }
+}
