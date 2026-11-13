@@ -216,6 +216,21 @@
 | 装備 | `equipment.<head|chest|legs|feet|offhand>.<count|weight|durability_*>`, `armor.points`, `armor.toughness`, `armor.equipped_slots`, `armor.durability_remaining` / `_max` / `_percent` |
 | まわり | `nearby.entities.<半径>`, `nearby.players.<半径>`, `nearby.entity.<モブ>.<半径>`（半径 1〜128） |
 
+### 引数を付ける統計（v1.5.8）
+
+引数の後ろにタグも付けられます（例 `stat:in_area.0.60.0.20.80.20.red`）。今の値なので `/rt:play` で 0 に戻りません。
+
+| 統計 | 値 |
+|---|---|
+| `scoreboard.<スコア名>` | そのスコアボードの値（大文字・小文字はそのまま） |
+| `has_tag.<タグ名>` | タグを持っていれば 1（全員分の合計 = 持っている人数） |
+| `in_area.<x1>.<y1>.<z1>.<x2>.<y2>.<z2>` | 範囲の中にいれば 1（合計 = 中にいる人数）。角のブロックも含む |
+| `distance_to.<x>.<y>.<z>` | その地点までの距離（ブロック） |
+| `holding.<アイテム>` | 手に持っていれば 1 |
+| `wearing.<アイテム>` | 頭・胴・脚・足・左手のどこかに着けていれば 1 |
+
+座標は整数だけ。マイナスは `-10` でも `m10` でも書ける（`/rt:stat` の式の中では `-` が引き算になるので `m10` を使う）。引数が足りない・数字でないときは 0。
+
 `inventory.` `held.` `armor.` などで始まる今の値には、タグを付けられません。
 
 今の値も、数える対象の人 **全員の合計** になります（2人いて体力が 13 と 20 なら `stat:health` は 33）。1人の値を見たいときは、その人にタグを付けて `stat:health.me` のように書きます。持っているアイテムの数は `stat:inventory.item.diamond.count`（`minecraft:` は省略可）。

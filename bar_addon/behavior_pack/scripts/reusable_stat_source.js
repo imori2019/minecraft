@@ -1,4 +1,4 @@
-import { system } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import {
   normalizeReusableStatKey,
   getReusableStoredStat
@@ -121,6 +121,120 @@ var TEAM_WORDS = [
   "all"
 ];
 
+// ---------------------------------------------------------------------------
+// Stats that take their own arguments (v1.5.8). The arguments come first, and
+// anything after them is the タグ, as with the other stats.
+//
+//   scoreboard.<objective>                 a scoreboard value
+//   has_tag.<tag>                          1 when the player has the tag
+//   in_area.<x1>.<y1>.<z1>.<x2>.<y2>.<z2>  1 inside the box (corners included)
+//   distance_to.<x>.<y>.<z>                blocks to that point
+//   holding.<item>                         1 while holding the item
+//   wearing.<item>                         1 while wearing it (armor / offhand)
+//
+// Coordinates are whole numbers. m10 is the same as -10 (handy in /rt:stat
+// formulas, where - means minus).
+// Objective and tag names keep their capital letters.
+// ---------------------------------------------------------------------------
+var ARGUMENT_STATS = {
+  scoreboard: { count: 1, kind: "name" },
+  has_tag: { count: 1, kind: "name" },
+  in_area: { count: 6, kind: "number" },
+  distance_to: { count: 3, kind: "number" },
+  holding: { count: 1, kind: "id" },
+  wearing: { count: 1, kind: "id" }
+};
+
+function coordinateText(value) {
+  var text = String(value).trim().toLowerCase();
+  if (/^m\d+$/.test(text)) text = "-" + text.slice(1);
+  if (!/^-?\d+$/.test(text)) return undefined;
+  return String(Math.floor(Number(text)));
+}
+
+function parseArgumentStat(segs) {
+  var head = String(segs[0]).trim().toLowerCase();
+  var spec = ARGUMENT_STATS[head];
+  if (!spec) return undefined;
+  if (segs.length < 1 + spec.count) return { key: "", tag: "", error: "missing" };
+
+  var args = [];
+  for (var i = 1; i <= spec.count; i++) {
+    var raw = segs[i];
+    if (spec.kind === "number") {
+      var number = coordinateText(raw);
+      if (number === undefined) return { key: "", tag: "", error: "number" };
+      args.push(number);
+    } else if (spec.kind === "id") {
+      var id = normalizeReusableStatKey(raw);
+      if (id.indexOf(".") < 0) id = "minecraft." + id;
+      args.push(id);
+    } else {
+      args.push(String(raw).trim());
+    }
+  }
+
+  return { key: head + "." + args.join("."), tag: segs.slice(1 + spec.count).join(".") };
+}
+
+function isArgumentStatKey(key) {
+  var head = String(key || "").split(".")[0];
+  return !!ARGUMENT_STATS[head];
+}
+
+function scoreValue(player, objectiveName) {
+  try {
+    var objective = world.scoreboard.getObjective(objectiveName);
+    if (!objective) return 0;
+    var value = objective.getScore(player.scoreboardIdentity || player);
+    return typeof value === "number" && isFinite(value) ? value : 0;
+  } catch (e) {}
+  return 0;
+}
+
+function argumentStatValue(player, key) {
+  var parts = String(key).split(".");
+  var head = parts[0];
+  var rest = parts.slice(1);
+
+  if (head === "scoreboard") return scoreValue(player, rest.join("."));
+
+  if (head === "has_tag") {
+    try { return player.hasTag(rest.join(".")) ? 1 : 0; } catch (e) {}
+    return 0;
+  }
+
+  if (head === "in_area" || head === "distance_to") {
+    var p;
+    try { p = player.location; } catch (e2) {}
+    if (!p) return 0;
+    var n = rest.map(Number);
+
+    if (head === "distance_to") {
+      var dx = p.x - (n[0] + 0.5);
+      var dy = p.y - n[1];
+      var dz = p.z - (n[2] + 0.5);
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    var bx = Math.floor(p.x);
+    var by = Math.floor(p.y);
+    var bz = Math.floor(p.z);
+    return (
+      bx >= Math.min(n[0], n[3]) && bx <= Math.max(n[0], n[3])
+      && by >= Math.min(n[1], n[4]) && by <= Math.max(n[1], n[4])
+      && bz >= Math.min(n[2], n[5]) && bz <= Math.max(n[2], n[5])
+    ) ? 1 : 0;
+  }
+
+  if (head === "holding" || head === "wearing") {
+    var wanted = rest.join(".");
+    return getReusableCurrentStat(player, "item_check." + head + "." + wanted) ? 1 : 0;
+  }
+
+  return 0;
+}
+
 function resolveAlias(key) {
   return ALIASES[key] || key;
 }
@@ -138,6 +252,9 @@ function parseSingleStat(source) {
   }
 
   if (segs.length <= 0) return { key: "", tag: "" };
+
+  var argStat = parseArgumentStat(segs);
+  if (argStat) return argStat;
 
   var head = normalizeReusableStatKey(segs[0]);
 
@@ -231,6 +348,7 @@ export function reusableStatKeyFromSource(source) {
 // ---------------------------------------------------------------------------
 function statKeyIsKnown(key) {
   if (KNOWN_STAT_KEYS.indexOf(key) >= 0) return true;
+  if (isArgumentStatKey(key)) return true;
 
   for (var i = 0; i < ID_FAMILIES.length; i++) {
     if (key.slice(0, ID_FAMILIES[i].length + 1) === ID_FAMILIES[i] + ".") return true;
@@ -243,7 +361,7 @@ function statKeyIsKnown(key) {
 
 // Names that already mean something as the first part of stat:...
 function builtInStatHeads() {
-  var heads = ["list", "delete"].concat(TEAM_WORDS, ID_FAMILIES);
+  var heads = ["list", "delete"].concat(TEAM_WORDS, ID_FAMILIES, Object.keys(ARGUMENT_STATS));
 
   for (var i = 0; i < KNOWN_STAT_KEYS.length; i++) {
     heads.push(KNOWN_STAT_KEYS[i].split(".")[0]);
@@ -337,6 +455,7 @@ var RESET_TOGETHER = {
 
 // Every stored stat to set to 0 when `key` is reset.
 export function reusableStatResetKeys(key) {
+  if (isArgumentStatKey(key)) return [];
   return [reusableStatStoredKey(key)].concat(RESET_TOGETHER[key] || []);
 }
 
@@ -367,6 +486,8 @@ function cachedCurrentValue(player, key) {
 // second time would read the namespace of an add-on mob as the mob and the
 // rest as a tag ("kills.minecraft.mypack" + tag "giant").
 function resolvedStatValue(player, key) {
+  if (isArgumentStatKey(key)) return rounded(argumentStatValue(player, key));
+
   var current = cachedCurrentValue(player, key);
   if (current !== undefined) return rounded(current);
 

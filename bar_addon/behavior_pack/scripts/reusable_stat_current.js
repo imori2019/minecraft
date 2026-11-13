@@ -425,6 +425,26 @@ export function getReusableCurrentStat(player, rawKey) {
     return armorValue(player, key.slice(6));
   }
 
+  // v1.5.8: item_check.holding.<item> / item_check.wearing.<item> (1 or 0)
+  if (key.slice(0, 11) === "item_check.") {
+    var checkParts = key.slice(11).split(".");
+    var where = checkParts[0];
+    var wantedId = checkParts.slice(1).join(".");
+    var slotsToCheck = where === "holding"
+      ? ["mainhand"]
+      : ["head", "chest", "legs", "feet", "offhand"];
+
+    for (var c = 0; c < slotsToCheck.length; c++) {
+      var checked = slotsToCheck[c] === "mainhand"
+        ? heldItem(player)
+        : equipmentItem(player, slotsToCheck[c]);
+      try {
+        if (checked && normalizeReusableStatKey(checked.typeId) === wantedId) return 1;
+      } catch (eCheck) {}
+    }
+    return 0;
+  }
+
   // v1.5.8: hunger bar (0-20), saturation, exhaustion
   if (key === "hunger" || key === "saturation" || key === "exhaustion") {
     var attribute;
