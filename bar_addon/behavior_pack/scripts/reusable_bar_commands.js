@@ -44,7 +44,8 @@ import {
 import {
   isReusableStatSource,
   reusableStatComboNameError,
-  reusableStatComboMember
+  reusableStatComboMember,
+  reusableStatSourceError
 } from "./reusable_stat_source.js";
 import {
   deleteReusableStatCombo,
@@ -3617,6 +3618,9 @@ export function registerBarCustomCommands(startupEvent, options) {
       );
       if (!check.ok) return commandFailure(check.message);
 
+      var counterStatError = reusableStatSourceError(list[0]);
+      if (counterStatError) return commandFailure(counterStatError);
+
       if (!counterDisplayIsValid(list[3])) {
         return commandFailure(
           "Display must be count, d<seconds>, a<seconds> (up to 5999 seconds), or none"
@@ -3663,6 +3667,9 @@ export function registerBarCustomCommands(startupEvent, options) {
 
     registry.registerCommand(definition, function (origin, ...args) {
       var list = commandArgs(args);
+      var ratioStatError = reusableStatSourceError(list[0]);
+      if (ratioStatError) return commandFailure(ratioStatError);
+
       var selectedTeams = parseRatioTeamSelection(list[1]);
       var requestedSeconds = (
         list[3] === undefined

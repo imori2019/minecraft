@@ -318,6 +318,41 @@ function statTextSegments(source) {
   return segs;
 }
 
+// Checks the stat:... of a bar command. Returns "" when it can be used,
+// otherwise a short reason. Mob / block / item names after kills. etc.
+// cannot be checked here and are accepted (they just stay 0 when wrong).
+var ARGUMENT_STAT_USAGE = {
+  scoreboard: "scoreboard.<objective>",
+  has_tag: "has_tag.<tag>",
+  in_area: "in_area.<x1>.<y1>.<z1>.<x2>.<y2>.<z2> (whole numbers)",
+  distance_to: "distance_to.<x>.<y>.<z> (whole numbers)",
+  holding: "holding.<item>",
+  wearing: "wearing.<item>"
+};
+
+export function reusableStatSourceError(source) {
+  if (!isReusableStatSource(source)) return "";
+
+  var segs = statTextSegments(source);
+  if (segs.length <= 0) return "Write a stat after stat: (for example stat:mob_kills)";
+
+  if (getReusableStatCombo(segs[0])) return "";
+
+  var argHead = String(segs[0]).trim().toLowerCase();
+  if (ARGUMENT_STATS[argHead]) {
+    var arg = parseArgumentStat(segs);
+    if (arg && arg.error) return "Use stat:" + ARGUMENT_STAT_USAGE[argHead];
+    return "";
+  }
+
+  var one = parseSingleStat(source);
+  if (!one.key || !statKeyIsKnown(one.key)) {
+    return "Unknown stat '" + String(source).trim().slice(5)
+      + "'. Check the spelling (the list is in COMMANDS.md)";
+  }
+  return "";
+}
+
 // Returns { key, keys, tag, items }. For a named stat created with /rt:stat,
 // keys lists every stat it uses and items is its formula.
 export function parseReusableStatSource(source) {
@@ -403,6 +438,14 @@ export function reusableStatComboMember(spec) {
       key: "",
       error: "'" + segs[0] + "' is a named stat. Put built-in stats here"
     };
+  }
+
+  var argHead = String(segs[0]).trim().toLowerCase();
+  if (ARGUMENT_STATS[argHead]) {
+    var arg = parseArgumentStat(segs);
+    if (arg && arg.error) {
+      return { ok: false, key: "", error: "Use " + ARGUMENT_STAT_USAGE[argHead] };
+    }
   }
 
   var one = parseSingleStat(spec);
