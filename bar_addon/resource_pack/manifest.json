@@ -1,0 +1,46 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "バーアドオン！ RP",
+    "description": "様々なバーが使えるようになるリソースパックです。",
+    "uuid": "d505d890-be2b-4c9c-922b-1ddfc5eba769",
+    "version": [
+      1,
+      5,
+      8
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "description": "Resources",
+      "type": "resources",
+      "uuid": "a57c45cd-ea97-420e-91f3-65795d117a40",
+      "version": [
+        1,
+        5,
+        8
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "71aaefa6-3663-4831-9b71-c830d56dbd54",
+      "version": [
+        1,
+        5,
+        8
+      ]
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "かんぬし"
+    ],
+    "license": "closed"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.80",
+  "block_hakobiya:red_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:blue_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:yellow_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:green_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:cyan_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:purple_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:orange_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:pink_base_block": {
+    "sound": "stone"
+  },
+  "block_hakobiya:white_base_block": {
+    "sound": "stone"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:block": {
+    "description": {
+      "identifier": "block_hakobiya:purple_base_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "purple_base_block",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:item_visual": {
+        "geometry": "minecraft:geometry.full_block",
+        "material_instances": {
+          "*": {
+            "texture": "purple_base_block",
+            "render_method": "opaque"
+          }
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1.8
+      },
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:map_color": "#8932B8",
+      "minecraft:collision_box": true,
+      "minecraft:selection_box": true
+    }
+  }
+}

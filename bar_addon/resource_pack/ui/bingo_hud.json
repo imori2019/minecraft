@@ -1,0 +1,1402 @@
+{
+  "namespace": "tb::bingo_hud",
+  "hunt_timer_digit_base": {
+    "type": "label",
+    "text": "0",
+    "size": [
+      6,
+      8
+    ],
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "offset": [
+      0,
+      0
+    ],
+    "layer": 1,
+    "text_alignment": "center",
+    "color": [
+      1,
+      1,
+      1
+    ],
+    "shadow": true,
+    "font_scale_factor": 1.0,
+    "visible": false,
+    "font_size": "normal",
+    "font_type": "classic",
+    "property_bag": {
+      "#font_type": "classic"
+    },
+    "bindings": [
+      {
+        "binding_type": "view",
+        "source_property_name": "#font_type",
+        "target_property_name": "#font_type"
+      }
+    ]
+  },
+  "hunt_timer_panel": {
+    "type": "panel",
+    "size": [
+      1,
+      8
+    ],
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "offset": [
+      0,
+      2
+    ],
+    "layer": 30,
+    "visible": false,
+    "bindings": [
+      {
+        "binding_name": "#hud_subtitle_text_string"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#hud_subtitle_text_string - '!t|') = #hud_subtitle_text_string))",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "shadow_line@tb::bingo_hud.hunt_timer_shadow_line": {}
+      },
+      {
+        "foreground_line@tb::bingo_hud.hunt_timer_foreground_line": {}
+      }
+    ]
+  },
+  "timer_label_base": {
+    "type": "label",
+    "text": "#text",
+    "size": [
+      "default",
+      8
+    ],
+    "layer": 34,
+    "text_alignment": "left",
+    "color": [
+      1,
+      1,
+      1
+    ],
+    "shadow": false,
+    "font_scale_factor": 1.0,
+    "visible": false,
+    "ignored": false,
+    "bindings": [
+      {
+        "binding_type": "global",
+        "binding_name": "#hud_title_text_string",
+        "binding_name_override": "#hud_title_text_string"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#hud_title_text_string - '!rtl.') = #hud_title_text_string))",
+        "target_property_name": "#visible"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "((#hud_title_text_string - '!rtl.') = #hud_title_text_string)",
+        "target_property_name": "#ignored"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(#hud_title_text_string - '!rtl.')",
+        "target_property_name": "#text"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "#font_type",
+        "target_property_name": "#font_type"
+      }
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "font_size": "normal",
+    "font_type": "classic",
+    "property_bag": {
+      "#font_type": "classic"
+    }
+  },
+  "hunt_timer_digits_panel": {
+    "type": "panel",
+    "size": [
+      30,
+      8
+    ],
+    "layer": 30,
+    "controls": [
+      {
+        "timer_colon@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": ":",
+          "offset": [
+            0,
+            0
+          ],
+          "visible": true,
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          },
+          "bindings": [
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ]
+        }
+      },
+      {
+        "timer_a0@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "0",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta0|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a1@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "1",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta1|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a2@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "2",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta2|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a3@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "3",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta3|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a4@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "4",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta4|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a5@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "5",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta5|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a6@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "6",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta6|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a7@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "7",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta7|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a8@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "8",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta8|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_a9@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "9",
+          "offset": [
+            -12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|ta9|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b0@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "0",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb0|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b1@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "1",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb1|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b2@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "2",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb2|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b3@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "3",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb3|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b4@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "4",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb4|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b5@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "5",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb5|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b6@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "6",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb6|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b7@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "7",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb7|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b8@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "8",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb8|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_b9@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "9",
+          "offset": [
+            -6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tb9|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c0@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "0",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc0|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c1@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "1",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc1|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c2@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "2",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc2|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c3@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "3",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc3|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c4@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "4",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc4|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c5@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "5",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc5|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c6@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "6",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc6|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c7@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "7",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc7|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c8@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "8",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc8|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_c9@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "9",
+          "offset": [
+            6,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|tc9|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d0@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "0",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td0|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d1@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "1",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td1|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d2@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "2",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td2|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d3@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "3",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td3|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d4@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "4",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td4|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d5@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "5",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td5|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d6@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "6",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td6|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d7@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "7",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td7|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d8@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "8",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td8|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      },
+      {
+        "timer_d9@tb::bingo_hud.hunt_timer_digit_base": {
+          "text": "9",
+          "offset": [
+            12,
+            0
+          ],
+          "bindings": [
+            {
+              "binding_name": "#hud_subtitle_text_string"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#hud_subtitle_text_string - '|td9|') = #hud_subtitle_text_string))",
+              "target_property_name": "#visible"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "#font_type",
+              "target_property_name": "#font_type"
+            }
+          ],
+          "font_type": "classic",
+          "property_bag": {
+            "#font_type": "classic"
+          }
+        }
+      }
+    ]
+  },
+  "timer_label_shadow_base": {
+    "type": "label",
+    "text": "#text",
+    "size": [
+      "default",
+      8
+    ],
+    "layer": 32,
+    "text_alignment": "left",
+    "color": [
+      0.18,
+      0.18,
+      0.18
+    ],
+    "shadow": false,
+    "font_scale_factor": 1.0,
+    "visible": false,
+    "ignored": false,
+    "bindings": [
+      {
+        "binding_type": "global",
+        "binding_name": "#hud_title_text_string",
+        "binding_name_override": "#hud_title_text_string"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#hud_title_text_string - '!rtl.') = #hud_title_text_string))",
+        "target_property_name": "#visible"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "((#hud_title_text_string - '!rtl.') = #hud_title_text_string)",
+        "target_property_name": "#ignored"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(#hud_title_text_string - '!rtl.')",
+        "target_property_name": "#text"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "#font_type",
+        "target_property_name": "#font_type"
+      }
+    ],
+    "offset": [
+      0,
+      0
+    ],
+    "font_type": "classic",
+    "property_bag": {
+      "#font_type": "classic"
+    }
+  },
+  "hunt_timer_foreground_line": {
+    "type": "stack_panel",
+    "orientation": "horizontal",
+    "size": [
+      "100%c",
+      8
+    ],
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "offset": [
+      -3,
+      0
+    ],
+    "layer": 34,
+    "controls": [
+      {
+        "label@tb::bingo_hud.timer_label_base": {}
+      },
+      {
+        "gap": {
+          "type": "panel",
+          "size": [
+            4,
+            8
+          ]
+        }
+      },
+      {
+        "digits@tb::bingo_hud.hunt_timer_digits_panel": {}
+      }
+    ]
+  },
+  "hunt_timer_shadow_line": {
+    "type": "stack_panel",
+    "orientation": "horizontal",
+    "size": [
+      "100%c",
+      8
+    ],
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "offset": [
+      -2,
+      1
+    ],
+    "layer": 32,
+    "controls": [
+      {
+        "label_shadow@tb::bingo_hud.timer_label_shadow_base": {}
+      },
+      {
+        "gap_shadow": {
+          "type": "panel",
+          "size": [
+            4,
+            8
+          ]
+        }
+      },
+      {
+        "timer_spacer": {
+          "type": "panel",
+          "size": [
+            30,
+            8
+          ]
+        }
+      }
+    ]
+  }
+}
