@@ -327,9 +327,10 @@ function cachedCurrentValue(player, key) {
   return value;
 }
 
-export function getReusableStatValue(player, rawKey) {
-  var key = reusableStatKeyFromSource(rawKey);
-
+// `key` must already be resolved (e.g. "kills.mypack.giant"). Parsing it a
+// second time would read the namespace of an add-on mob as the mob and the
+// rest as a tag ("kills.minecraft.mypack" + tag "giant").
+function resolvedStatValue(player, key) {
   var current = cachedCurrentValue(player, key);
   if (current !== undefined) return rounded(current);
 
@@ -339,6 +340,10 @@ export function getReusableStatValue(player, rawKey) {
   return rounded(getReusableStoredStat(player, key, 0));
 }
 
+export function getReusableStatValue(player, rawKey) {
+  return resolvedStatValue(player, reusableStatKeyFromSource(rawKey));
+}
+
 export function getReusableStatSourceValue(player, source) {
   if (!isReusableStatSource(source)) return undefined;
 
@@ -346,11 +351,11 @@ export function getReusableStatSourceValue(player, source) {
 
   if (parsed.items) {
     return rounded(evaluateStatExpression(parsed.items, function (key) {
-      return getReusableStatValue(player, key);
+      return resolvedStatValue(player, key);
     }));
   }
 
-  return rounded(Number(getReusableStatValue(player, parsed.key)) || 0);
+  return rounded(Number(resolvedStatValue(player, parsed.key)) || 0);
 }
 
 export function reusableSourceLabel(source) {
