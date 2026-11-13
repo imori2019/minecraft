@@ -117,6 +117,8 @@ function containerValue(summary, key) {
 
   if (key.slice(0, 5) === "item." && key.slice(-6) === ".count") {
     var itemId = key.slice(5, -6);
+    // item.diamond.count means minecraft:diamond, like everywhere else.
+    if (itemId.indexOf(".") < 0) itemId = "minecraft." + itemId;
     return summary.counts[itemId] || 0;
   }
 

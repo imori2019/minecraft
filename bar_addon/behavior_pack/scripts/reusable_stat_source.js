@@ -285,6 +285,23 @@ export function reusableStatComboMember(spec) {
   return { ok: true, key: one.key, error: "" };
 }
 
+// Time stats in seconds / minutes / hours are worked out from the stored
+// tick count, so resetting them means resetting that tick count.
+var DERIVED_FROM_TICKS = {
+  play_time_seconds: "play_time_ticks",
+  play_time_minutes: "play_time_ticks",
+  play_time_hours: "play_time_ticks",
+  life_time_seconds: "life_time_ticks",
+  longest_life_seconds: "longest_life_ticks",
+  session_time_seconds: "session_time_ticks",
+  longest_session_seconds: "longest_session_ticks"
+};
+
+// The stored stat that holds the value of `key` (the key itself for most).
+export function reusableStatStoredKey(key) {
+  return DERIVED_FROM_TICKS[key] || key;
+}
+
 function derivedStoredValue(player, key) {
   if (key === "play_time_seconds") {
     return getReusableStoredStat(player, "play_time_ticks", 0) / 20;
